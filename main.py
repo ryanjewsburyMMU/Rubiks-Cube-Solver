@@ -3,63 +3,96 @@
 import cv2
 import time
 import numpy as np
+import webcolors
 
-cap = cv2.VideoCapture(0)
+import gui_test
 
-# https://stackoverflow.com/questions/52083797/opencv-detecting-color-ranges-and-display-on-console
-
-# https://stackoverflow.com/questions/60051941/find-the-coordinates-in-an-image-where-a-specified-colour-is-detected
-
-# ASK RYAN ABOUT ONLY DETECTING COLOUR IN CERTIAN RANGE - FOR EXAMPLE BOX IN CENTER OF SCREEN
-font = cv2.FONT_HERSHEY_SIMPLEX
-
-while True:
-    ret, frame = cap.read()
-
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    # Red Colour
-    low_red = np.array([161, 155, 84])
-    high_red = np.array([179, 255, 255])
-    red_mask = cv2.inRange(hsv_frame, low_red, high_red)
-
-    # Blue Colour
-    low_blue = np.array([90, 60, 0])
-    high_blue = np.array([121, 255, 255])
-    blue_mask = cv2.inRange(hsv_frame, low_red, high_red)
-
-    # Display Camera
-    cv2.putText(frame, 'Rubiks Cube Solver - v1.0', (10, 1050), font, 1, (200,200,200), 2, cv2.LINE_AA)
-
-    cv2.rectangle(frame, (725, 300), (825, 400), (255, 0, 0), 2)
-    # Center of each colour
-    color = frame[775, 350]  # row major, like in opencv
-    print("Color at 100x100: ", (color[0] << 16) + (color[1] << 8) + (color[2]))
-    center_x = print((725 + 825) / 2)
-    center_y = print((300 + 400) / 2)
-
-
-    cv2.rectangle(frame, (900, 300), (1000, 400), (255, 0, 0), 2)
-    cv2.rectangle(frame, (1085, 300), (1185, 400), (255, 0, 0), 2)
-
-    cv2.rectangle(frame, (725, 500), (825, 600), (255, 0, 0), 2)
-    cv2.rectangle(frame, (900, 500), (1000, 600), (255, 0, 0), 2)
-    cv2.rectangle(frame, (1085, 500), (1185, 600), (255, 0, 0), 2)
-
-    cv2.rectangle(frame, (725, 700), (825, 800), (255, 0, 0), 2)
-    cv2.rectangle(frame, (900, 700), (1000, 800), (255, 0, 0), 2)
-    cv2.rectangle(frame, (1085, 700), (1185, 800), (255, 0, 0), 2)
-
-
-    cv2.imshow("blue mask", blue_mask)
-    cv2.imshow("Frame", frame)
-
-    key = cv2.waitKey(1)
-
-    if key == 27:
-        break
-
-
-
-#    low_red = np.array([161, 155, 84])
-    high_red = np.array([179, 255, 255])
+# import segmentation
+# import scanCube
+# import first_attempt
+# import RubiksCube
+# image = cv2.imread("./venv/data/image2.bmp")
+# import CubeScanner
+# # https://stackoverflow.com/questions/52083797/opencv-detecting-color-ranges-and-display-on-console
+#
+# # https://stackoverflow.com/questions/60051941/find-the-coordinates-in-an-image-where-a-specified-colour-is-detected
+#
+# # Collect data of colours
+#
+# font = cv2.FONT_HERSHEY_SIMPLEX
+# # cv2.imshow("Frame", image[:, :, 0])
+#
+#
+# # gap top = 160
+# cv2.rectangle(image, (480, 200), (530, 250), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (615, 200), (665, 250), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (750, 200), (800, 250), (192, 192, 192), thickness=3)
+#
+# cv2.rectangle(image, (480, 335), (530, 385), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (615, 335), (665, 385), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (750, 335), (800, 385), (192, 192, 192), thickness=3)
+#
+# cv2.rectangle(image, (480, 470), (530, 520), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (615, 470), (665, 520), (192, 192, 192), thickness=3)
+# cv2.rectangle(image, (750, 470), (800, 520), (192, 192, 192), thickness=3)
+#
+# # gab bottom = 160
+#
+#
+#
+# cv2.imshow("Frame", image)
+#
+#
+# # Testing Cropped Image
+#
+# # Top Layer
+# # Top Left
+# cv2.imshow("Top Left", image[200:250, 480:530, :])
+# print("Top Left: ", np.median(image[200:250, 480:530,:], axis=(0,1)))
+#
+# # Top Center
+# cv2.imshow("Top Middle", image[200:250, 615:665, :])
+# print("Top Center: ",np.median(image[200:250, 615:665,:], axis=(0,1)))
+#
+# # Top Center
+# cv2.imshow("Top Right", image[200:250, 750:800, :])
+# # print("Top Right: ", np.median(image[200:250, 750:800,:], axis=(0,1)))
+#
+#
+# # Center Section
+#
+# # Center left
+# cv2.imshow("Center Left", image[335:385, 480:530, :])
+# # print("Center Left: ",np.median(image[335:385, 615:665,:], axis=(0,1)))
+#
+# # Center Piece
+# cv2.imshow("Center Piece", image[335:385, 615:665, :])
+# # print("Center Piece: ",np.median(image[335:385, 615:665,:], axis=(0,1)))
+#
+# # Center Right
+# cv2.imshow("Center Right", image[335:385, 750:800, :])
+# # print("Center Right: ",np.median(image[335:385, 750:800,:], axis=(0,1)))
+#
+#
+# # Bottom left
+# cv2.imshow("Bottom Left", image[470:520, 480:530, :])
+# # print("Bottom Left: ",np.median(image[470:520, 615:665,:], axis=(0,1)))
+#
+# # Bottom Piece
+# cv2.imshow("Bottom Piece", image[470:520, 615:665, :])
+# # print("Bottom Center: ",np.median(image[470:520, 615:665,:], axis=(0,1)))
+#
+# # Bottom Right
+# cv2.imshow("Bottom Right", image[470:520, 750:800, :])
+# # print("Bottom Right: ", np.median(image[470:520, 750:800,:], axis=(0,1)))
+#
+#
+#
+#
+# cv2.waitKey(1000000)
+#
+# key = cv2.waitKey(1)
+#
+#
+#
+#
