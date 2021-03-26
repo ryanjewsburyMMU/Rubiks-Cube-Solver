@@ -1,4 +1,3 @@
-# def redRectangle():
 from rubik.cube import Cube
 from tkinter import *
 from tkinter import messagebox
