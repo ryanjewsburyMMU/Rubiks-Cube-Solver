@@ -1359,8 +1359,7 @@ def testSolve(amount):
     print("Success Rate = ", int((solve_success / amount) * 100), "%")
     print("Failed Scrambles = ", int((solve_fail / amount) * 100), "%")
     print("ID of failed scrambled = ", fail_scrambles)
-
-    print("Average Solve Length = ", statistics.mean(size_algo))
+    print(c)
 
 
 # ------ #
@@ -1370,7 +1369,7 @@ def testSolve(amount):
 
 
 
-testSolve(100)
+testSolve(1)
 
 
 
