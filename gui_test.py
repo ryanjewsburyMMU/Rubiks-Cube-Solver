@@ -1,61 +1,9 @@
-# from tkinter import *
-# # import RPi.GPIO as GPIO
-# from datetime import *
-# from time import *
-#
-# root = Tk()  # Draws the window
-#
-# rectangleId = None
-#
-#
-# def whiteRectangle():
-#     global rectangleId
-#     LEDCanvas.itemconfigure(rectangleId, fill="white")
-#     print('white should be on now')
-#
-# def greenRect():
-#     global rectangleId
-#     LEDCanvas.itemconfigure(rectangleId, fill="green")
-#     print('white should be on now')
-#
-#
 # def redRectangle():
-#     global rectangleId
-#     print('red should be on now')
-#     rectangleId = LEDCanvas.create_rectangle(20, 20, 80, 80, width=0, fill='red')
-#     blobid = LEDCanvas.create_rectangle(60, 60, 80, 80, width=0, fill='red')
-#     root.after(2000, whiteRectangle)
-#     root.after(2000, greenRect)
-#
-#
-#
-#
-#
-#
-# # These next lines define size, position and title of tkinter window
-# root.geometry('350x550+20+100')  # width x height + xpos + ypos
-# root.title("Change Colours")
-#
-# # Frame and its contents
-# mainFrame = Frame(root, width=200, height=200)
-# mainFrame.grid(row=0, column=0, padx=10, pady=2)
-#
-# LEDCanvas = Canvas(mainFrame, width=200, height=100, bg='gray85')
-# LEDCanvas.grid(row=0, column=0, padx=10, pady=2)
-#
-# btnFrame = Frame(mainFrame, width=200, height=200)
-# btnFrame.grid(row=1, column=0, padx=10, pady=2)
-#
-# # resultlog = Text(mainFrame, width = 40, height = 24, takefocus=0)
-# # resultlog.grid(row=3, column=0, padx=10, pady=0)
-#
-# testBtn = Button(btnFrame, text="Test", command=redRectangle)
-# testBtn.grid(row=0, column=1, padx=10, pady=2)
-#
-# root.mainloop()
-
 from rubik.cube import Cube
 from tkinter import *
+from tkinter import messagebox
+
+
 # import RPi.GPIO as GPIO
 from datetime import *
 import time
@@ -93,11 +41,14 @@ def makeMove(move):
 
 def performAlgorithm(algo):
     for move in algo.split():
-        c.sequence(move)
-        print(c)
-        cubeCanvas.after(100
-                         , updateCubeColours())
-        cubeCanvas.update_idletasks()
+        try:
+            c.sequence(move)
+            print(c)
+            cubeCanvas.after(100, updateCubeColours())
+            cubeCanvas.update_idletasks()
+        except:
+            print("Cannot Perform Move '" + move + "'")
+
 
 
 # Converts Cubie To Colour for Digital Cube
@@ -106,8 +57,8 @@ def colourFromLetter(value):
         colors = {'G': 'green', 'R': 'red', 'B': 'blue', 'O': 'orange', 'W': 'White', 'Y': 'Yellow'}
         return colors[value]
     except:
+        messagebox.showinfo("Say Hello", "Hello World")
         return None
-
 
 def updateCubeColours():
     # Green Face (Layer 1)
@@ -273,7 +224,6 @@ red_22 = cubeCanvas.create_rectangle(420, 640, 490, 710, width=0, fill='red')
 
 
 
-
 updateCubeColours()
 cubeCanvas.update_idletasks()
 
@@ -286,7 +236,7 @@ cubeCanvas.update_idletasks()
 
 solveButton = Button(root, text="Solve Cube", command=lambda: performAlgorithm("R Fi U F B B U U B B B R B Ri Bi B D B Di Bi D B Di Bi D B Di Bi Li Bi L B Li Bi L B Li Bi L B Li Bi L B Li Bi L B  L B Li Bi Di Bi D B B Ui Bi U B R B Ri Bi B B Ri Bi R B D B Di Bi B B B Li Bi L B U B Ui B B B L B Li Bi Di Bi D B B U R B Ri Bi Ui  B B R B B Ri Ri Bi R R Bi Ri Ri B B R B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui  Mi Mi Bi M Bi Bi Mi Bi Mi Mi B B"))
 solveButton.config(font=("Arial", 20))
-solveButton.place(x=1100,y=300)
+solveButton.place(x=1150,y=600)
 
 
 # Label For Main Title
@@ -312,13 +262,23 @@ settingsButton.place(x=1230,y=100)
 # Scan Your Own Cube Label
 scan_title = Label(root, text = "Scan Your Own Cube")
 scan_title.config(font=("Arial", 20))
-scan_title.place(x=1110, y=200)
+scan_title.place(x=1110, y=150)
 
 # Scan Cube Button
 scanCube_button = Button(root, text="Scan Cube", command=lambda: print("Scan Cube Pressed"))
 scanCube_button.config(font=("Arial", 15))
-scanCube_button.place(x=1160,y=230)
+scanCube_button.place(x=1160,y=180)
 
+# Perform Move
+move_title = Label(root, text = "Make Your Own Move")
+move_title.config(font=("Arial", 20))
+move_title.place(x=1110, y=230)
+
+# Move Input
+moveInput = Entry(root)
+moveInput.place(x=1125, y=260)
+inputButton = Button(root, text="Make Move", command=lambda : performAlgorithm(moveInput.get()))
+inputButton.place(x=1160,y=290)
 
 root.mainloop()
 
