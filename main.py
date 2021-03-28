@@ -6,7 +6,7 @@ import numpy as np
 import webcolors
 
 import gui_test
-
+# import Solver
 # import segmentation
 # import scanCube
 # import first_attempt
