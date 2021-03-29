@@ -45,6 +45,8 @@ class CubeScanner():
         bottom_middle_color = (255, 255, 255)
         bottom_right_color = (255, 255, 255)
 
+        window_name = cv2.namedWindow("Test")
+
         text = "Please Scan The " + face_list[face_index] + " Face"
 
         cap = cv2.VideoCapture(0)
@@ -196,10 +198,10 @@ class CubeScanner():
                 else:
                     text = "Please Scan the " + face_list[face_index] + " Face"
 
-    def createCubeString(self, cube):
-        return cube
+    # def createCubeString(self, cube):
+    #     return cube
 
 
-c = CubeScanner()
-fullcube = c.scan()
-cubeString = c.createCubeString(fullcube)
+# c = CubeScanner()
+# fullcube = c.scan()
+# cubeString = c.createCubeString(fullcube)

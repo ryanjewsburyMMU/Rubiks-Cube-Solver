@@ -5,7 +5,9 @@ import time
 import numpy as np
 import webcolors
 
-import gui_test
+
+import new_gui
+# import gui_test
 # import Solver
 # import segmentation
 # import scanCube
@@ -13,7 +15,8 @@ import gui_test
 # import RubiksCube
 # image = cv2.imread("./venv/data/image2.bmp")
 # import CubeScanner
-# # https://stackoverflow.com/questions/52083797/opencv-detecting-color-ranges-and-display-on-console
+# # https://st
+# ackoverflow.com/questions/52083797/opencv-detecting-color-ranges-and-display-on-console
 #
 # # https://stackoverflow.com/questions/60051941/find-the-coordinates-in-an-image-where-a-specified-colour-is-detected
 #

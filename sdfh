@@ -1,14 +1,12 @@
-White Cross
- D F Di Fi L Fi D F Fi L F Ui D Fi R F
-White Corner
- Ri Bi R B D B Di Bi D B Di Bi D B Di Bi D B Di Bi D B Di Bi B B Li Bi L B L B Li Bi
-Second Layer
-  B B B D B Di Bi Ri Bi R B B B U B Ui Bi Li Bi L B Di Bi D B L B Li Bi
-Yellow Cross
-  U R B Ri Bi Ui
-Last Layer
-  Ri U R Di Ri Ui R D
-Final Corner
- Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui
-Final Edge
-  B B Mi Mi Bi M Bi Bi Mi Bi Mi Mi
+Notes:
+
+Not detecting yellow / white on startup...
+
+Implementaion of openccv works
+
+HOWEVER
+
+We need to adjust the order so that it falls in coreect format...
+
+It currently does not.
+

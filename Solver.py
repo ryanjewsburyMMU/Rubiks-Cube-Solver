@@ -975,7 +975,6 @@ class SolveCube:
         if self.c.is_solved():
             print("Cube Already Solved")
         else:
-            try:
                 print("----------------------------------------------------------------------------------")
                 stage_1 = self.solveWhiteCross()
                 print("----------------------------------------------------------------------------------")
@@ -991,27 +990,12 @@ class SolveCube:
                 print("----------------------------------------------------------------------------------")
                 stage_7 = self.solveFinalEdge()
                 print("----------------------------------------------------------------------------------")
-                if self.c.is_solved:
-                    return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
-                else:
-                    print("Cube Unsolvable")
-                    return None
-            except:
-                print("This cube is unsolvable")
-                return None
 
-    # Example Use:
-    # cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-    # cube.sequence(**Scramble In Here**)
-    # C = SolveCube(cube)
-    # algo = C.solveCube()
-    # print(algo)
+                return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
 
-#OOOOOWOOWGGGWWRBBBOYYGGGWWRBBBOYYGGGWWRBBBOYYRRYRRYRRY
-# #
-# cube = Cube("OOOOOOOOOGGGOWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-# cube.sequence("")
-# C = SolveCube(cube)
-# algo = C.solveCube()
-# print(algo)
 
+# cube = Cube("OOOOOOWWWWWRBBBOYYGGGGGGWWRBBBOYYGGGWWRBBBOYYRRYRRYRRY")
+# S =SolveCube(cube)
+# print(S.c)
+# S.solveCube()
+# print(S.c)
