@@ -24,8 +24,8 @@ mainFrame.grid(row=0, column=0, padx=10, pady=2)
 cubeCanvas = Canvas(mainFrame, width=1000, height=720, bg='black')
 cubeCanvas.grid(row=0, column=0, padx=0, pady=2)
 
-
-c = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+cube_layout = "OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR"
+c = Cube(cube_layout)
 def makeMove(move):
     print("Making move")
     c.sequence(move)
@@ -48,12 +48,13 @@ def performAlgorithm(algo):
 def colourFromLetter(value):
     try:
         colors = {'G': 'green', 'R': 'red', 'B': 'blue', 'O': 'orange', 'W': 'White', 'Y': 'Yellow'}
+        print(colors[value])
         return colors[value]
     except:
         messagebox.showinfo("Say Hello", "Hello World")
         return None
 
-
+# Updates cube colours from c
 def updateCubeColours():
     # Green Face (Layer 1)
     cubeCanvas.itemconfigure(green_00, fill=colourFromLetter(c.get_piece(-1, 1, -1).colors[0]))
@@ -135,7 +136,8 @@ def updateCubeColours():
 
 
 def editMode(edit_mode_label, edit_cube_button):
-    global edit_mode
+    global edit_mode, cube_layout
+    cubeCanvas.update_idletasks()
     edit_mode = not edit_mode
     if edit_mode:
         print("Entering Edit Mode")
@@ -147,6 +149,8 @@ def editMode(edit_mode_label, edit_cube_button):
         cubeCanvas.itemconfigure(green_color, state='normal')
         cubeCanvas.itemconfigure(orange_color, state='normal')
         cubeCanvas.itemconfigure(yellow_color, state='normal')
+        cubeCanvas.update_idletasks()
+        print(flattenCube())
     else:
         print("Leaving Edit mode")
         edit_cube_button.config(text="Enter Edit Mode")
@@ -157,6 +161,7 @@ def editMode(edit_mode_label, edit_cube_button):
         cubeCanvas.itemconfigure(green_color, state='hidden')
         cubeCanvas.itemconfigure(orange_color, state='hidden')
         cubeCanvas.itemconfigure(yellow_color, state='hidden')
+    print(flattenCube())
     return not edit_mode
 
 
@@ -198,10 +203,12 @@ def flattenCube():
     # Orange green red and blue working
     # Yellow and White not working?
 
-    print(convertToLetter(green_00))
-    print(convertToLetter(orange_00))
+    # print(convertToLetter(green_00))
+    # print(convertToLetter(orange_00))
+    # print(convertToLett(yellow_00))
 
-    cube_string += str(convertToLetter(orange_00) + convertToLetter(orange_01)+ convertToLetter(orange_01)
+
+    cube_string += str(convertToLetter(orange_00) + convertToLetter(orange_01)+ convertToLetter(orange_02)
     + convertToLetter(orange_10)+ convertToLetter(orange_11)+  convertToLetter(orange_12) + convertToLetter(orange_20)
     + convertToLetter(orange_21) + convertToLetter(orange_22))
 
@@ -376,17 +383,17 @@ cubeCanvas.tag_bind("red_22", "<Button-1>", editColor)
 
 
 def solveCube():
-    cubeCanvas.update_idletasks()
-    if flattenCube() == "OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR":
+    print(flattenCube())
+    cube = Cube(flattenCube())
+    print(cube)
+    if cube.is_solved():
+        print("cube = " + flattenCube())
         messagebox.showinfo("Cube Solved", "This cube is already solved!")
     else:
-        print(flattenCube())
-        new_cube = Cube(flattenCube())
-        solver = SolveCube(new_cube)
+        solver = SolveCube(cube)
         algorithm = solver.solveCube()
         print(algorithm)
         performAlgorithm(algorithm)
-
 
 solveButton = Button(root, text="Solve Cube", command=lambda: solveCube())
 solveButton.config(font=("Arial", 20))

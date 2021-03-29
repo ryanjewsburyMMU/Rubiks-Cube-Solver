@@ -975,23 +975,30 @@ class SolveCube:
         if self.c.is_solved():
             print("Cube Already Solved")
         else:
-            print("----------------------------------------------------------------------------------")
-            stage_1 = self.solveWhiteCross()
-            print("----------------------------------------------------------------------------------")
-            stage_2 = self.solveWhiteCorner()
-            print("----------------------------------------------------------------------------------")
-            stage_3 = self.solveSecondLayer()
-            print("----------------------------------------------------------------------------------")
-            stage_4 = self.solveYellowCross()
-            print("----------------------------------------------------------------------------------")
-            stage_5 = self.orientLastLayer()
-            print("----------------------------------------------------------------------------------")
-            stage_6 = self.solveFinalCorners()
-            print("----------------------------------------------------------------------------------")
-            stage_7 = self.solveFinalEdge()
-            print("----------------------------------------------------------------------------------")
-            print(self.c)
-            return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
+            try:
+                print("----------------------------------------------------------------------------------")
+                stage_1 = self.solveWhiteCross()
+                print("----------------------------------------------------------------------------------")
+                stage_2 = self.solveWhiteCorner()
+                print("----------------------------------------------------------------------------------")
+                stage_3 = self.solveSecondLayer()
+                print("----------------------------------------------------------------------------------")
+                stage_4 = self.solveYellowCross()
+                print("----------------------------------------------------------------------------------")
+                stage_5 = self.orientLastLayer()
+                print("----------------------------------------------------------------------------------")
+                stage_6 = self.solveFinalCorners()
+                print("----------------------------------------------------------------------------------")
+                stage_7 = self.solveFinalEdge()
+                print("----------------------------------------------------------------------------------")
+                if self.c.is_solved:
+                    return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
+                else:
+                    print("Cube Unsolvable")
+                    return None
+            except:
+                print("This cube is unsolvable")
+                return None
 
     # Example Use:
     # cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
@@ -1001,14 +1008,10 @@ class SolveCube:
     # print(algo)
 
 #OOOOOWOOWGGGWWRBBBOYYGGGWWRBBBOYYGGGWWRBBBOYYRRYRRYRRY
-#
-# cube = Cube("OOOOOWOOWGGGWWRBBBOYYGGGWWRBBBOYYGGGWWRBBBOYYRRYRRYRRY")
+# #
+# cube = Cube("OOOOOOOOOGGGOWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+# cube.sequence("")
 # C = SolveCube(cube)
 # algo = C.solveCube()
 # print(algo)
 
-
-cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-cube.sequence("R U Fi Di Bi R Ui B D")
-C = SolveCube(cube)
-C.solveCube()
