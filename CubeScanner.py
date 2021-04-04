@@ -100,6 +100,10 @@ class CubeScanner():
             elif (smallestValue == 5):
                 return "Blue"
 
+        def createCubeString(arr):
+            list = arr.tolist()
+            print(list)
+
 
         while True:
             ret, frame = cap.read()

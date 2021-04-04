@@ -23,9 +23,12 @@ mainFrame.grid(row=0, column=0, padx=10, pady=2)
 
 cubeCanvas = Canvas(mainFrame, width=1000, height=720, bg='black')
 cubeCanvas.grid(row=0, column=0, padx=0, pady=2)
-
+# WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB
+# OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR
 cube_layout = "OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR"
 c = Cube(cube_layout)
+
+
 def makeMove(move):
     print("Making move")
     c.sequence(move)

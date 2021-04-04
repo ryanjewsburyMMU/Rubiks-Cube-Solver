@@ -7,6 +7,13 @@ Implementaion of openccv works
 HOWEVER
 
 We need to adjust the order so that it falls in coreect format...
+cube seems to be creating string wrong....
+
 
 It currently does not.
 
+TODO:
+- Comment All Code
+- Do ALOT of testing
+- Try and give incorrect cubes  - test stability of error detection
+- Possibly Add simple timer - if time superpasses 15 seconds, alert user and error has occured. 

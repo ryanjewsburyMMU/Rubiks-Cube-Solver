@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 from CubeScanner import CubeScanner
 from Solver import SolveCube
+import numpy as np
 
 
 root = Tk()  # Draws the window
@@ -21,6 +22,21 @@ cubeCanvas = Canvas(mainFrame, width=1000, height=720, bg='black')
 cubeCanvas.grid(row=0, column=0, padx=0, pady=2)
 
 current_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+# WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB
+# OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR
+
+def checkSolvable(cube_string):
+    cube_colors = ["O", "W", "R", "G", "B", "Y"]
+    color_count = []
+    for i in range(len(cube_colors)):
+        color_count.append(str(cube_string.count(cube_colors[i])))
+    if all(x==color_count[0] for x in color_count):
+        print("All Colors Have 9")
+        return True
+    else:
+        print(color_count)
+        return False
+
 
 
 # Converts Cubie To Colour for Digital Cube
@@ -390,21 +406,58 @@ def solveCube():
         if new_cube.is_solved():
             messagebox.showinfo("Cube Solved", "This cube is already solved!")
         else:
-            solver = SolveCube(new_cube)
-            algo = solver.solveCube()
-            performAlgorithm(algo)
+            if checkSolvable(flattenCube()):
+                solver = SolveCube(new_cube)
+                algo = solver.solveCube()
+                if algo == None:
+                    messagebox.showinfo("Cube Unsolvable", "Double Check Values...")
+                else: performAlgorithm(algo)
+            else:
+                messagebox.showinfo("Cube Unsolvable", "Unequal Number of Colours")
+
 
 def scanCube():
     c = CubeScanner()
     fullcube = c.scan()
     print(fullcube)
-
     colors = {"White": "W", "Yellow": "Y", "Red": "R", "Green": "G", "Orange": "O", "Blue": "B"}
     cube_string = ""
-    for face in fullcube:
-        for index in face:
-            for indi in index:
-                cube_string += colors.get(indi)
+    # Layer 1
+    # Orange Face
+    for val in np.nditer(fullcube[5]):
+        cube_string += colors.get(str(val))
+    # Layer 2 (Top Row From Green-White-Blue-Yellow)
+    for val in np.nditer(fullcube[1][0]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[0][0]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[3][0]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[2][0]):
+        cube_string += colors.get(str(val))
+    # Layer 2 (Middle Row From Green-White-Blue-Yellow)
+    for val in np.nditer(fullcube[1][1]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[0][1]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[3][1]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[2][1]):
+        cube_string += colors.get(str(val))
+    # Layer 3 (Bottom Row From Green-White-Blue-Yellow)
+    for val in np.nditer(fullcube[1][2]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[0][2]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[3][2]):
+        cube_string += colors.get(str(val))
+    for val in np.nditer(fullcube[2][2]):
+        cube_string += colors.get(str(val))
+    # Red Face
+    for val in np.nditer(fullcube[4]):
+        cube_string += colors.get(str(val))
+
+    print("String = " + cube_string)
     updateCube(cube_string)
     updateCubeColours()
 
@@ -491,7 +544,8 @@ debugButton = Button(root, text="Print Cube", command=lambda: printDetails())
 debugButton.config(font=("Arial", 15))
 debugButton.place(x=1230, y=600)
 
-# print(flattenCube())
+checkSolvable(flattenCube())
 
+# print(flattenCube())
 root.resizable(False, False)
 root.mainloop()

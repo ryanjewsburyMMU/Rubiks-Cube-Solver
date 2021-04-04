@@ -1,5 +1,6 @@
 from rubik.cube import Cube
-
+from rubik_solver import utils
+import pycuber as pc
 class SolveCube:
     def __init__(self, cube):
         self.c = cube
@@ -77,8 +78,9 @@ class SolveCube:
         white_orange_solved = False
         white_red_solved = False
         cross_algorithm = ""
-
+        count = 1
         for val in range(len(white_pieces)):
+            print("Itter " + str(count + 1))
             target_face = ""
             target_location = ""
 
@@ -94,91 +96,114 @@ class SolveCube:
                 # Cases for blue/white being on GREEN Face
                 # Case 1 and 1a
                 if white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][2] == "B":
+                    print("Case 1 Found")
                     self.c.sequence("L D Fi")
                     cross_algorithm += " L D Fi"
                 elif white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][0] == "B":
+                    print("Case 2 Found")
                     self.c.sequence("L F F Li Fi Fi")
                     cross_algorithm += " L F F Li Fi Fi"
                 # Case 2 and 2a
                 if white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][0] == "B":
+                    print("Case 3 Found")
                     self.c.sequence("Fi Fi L F F")
                     cross_algorithm += " Fi Fi L F F"
                 elif white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][1] == "B":
+                    print("Case 4 Found")
                     self.c.sequence("Fi Ui F")
                     cross_algorithm += " Fi Ui F"
                 # Case 3 and 3a
                 if white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][2] == "B":
+                    print("Case 5 Found")
                     self.c.sequence("Bi Ui Fi L F F")
                     cross_algorithm += " Bi Ui Fi L F F"
                 elif white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][0] == "B":
+                    print("Case 6 Found")
                     self.c.sequence("Bi Bi R R")
                     cross_algorithm += " Bi Bi R R"
                 # Case 4 and 4a
                 if white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][1] == "B":
+                    print("Case 7 Found")
                     self.c.sequence("F D Fi")
                     cross_algorithm += " F D Fi"
                 elif white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][0] == "B":
+                    print("Case 8 Found")
                     self.c.sequence("F F Li F F")
                     cross_algorithm += " F F Li F F"
                 # Cases for blue/white being on RED Face
                 # Case 5 and 5a
                 if white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][2] == "B":
+                    print("Case 9 Found")
                     self.c.sequence("D R")
                     cross_algorithm += " D R"
                 elif white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][1] == "B":
+                    print("Case 10 Found")
                     self.c.sequence("D F Di Fi")
                     cross_algorithm += " D F Di Fi"
                 # Case 6 and 6a
                 if white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][1] == "B":
+                    print("Case 11 Found")
                     self.c.sequence("F Di Fi")
                     cross_algorithm += " F Di Fi"
                 elif white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][0] == "B":
+                    print("Case 12 Found")
                     self.c.sequence("R")
                     cross_algorithm += " R"
                 # Case 7 and 7a
                 if white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][2] == "B":
+                    print("Case 13 Found")
                     self.c.sequence("Di R D")
                     cross_algorithm += " Di R D"
                 elif white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][1] == "B":
+                    print("Case 14 Found")
                     self.c.sequence("B R R")
                     cross_algorithm += " B R R"
                 # Cases for blue/white being on BLUE Face
                 # Case 8 and 8a
                 if white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][2] == "B":
+                    print("Case 15 Found")
                     self.c.sequence("R Fi U F")
                     cross_algorithm += " R Fi U F"
                 elif white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][0] == "B":
+                    print("Case 16 Found")
                     print("CORRECT POSITION")
                 # Case 9
                 if white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][0] == "B":
+                    print("Case 17 Found")
                     self.c.sequence("Ri")
                     cross_algorithm += " Ri"
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "B":
+                    print("Case 18 Found")
                     self.c.sequence("Fi U F")
                     cross_algorithm += " Fi U F"
                 # Case 10
                 if white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][0] == "B":
+                    print("Case 19 Found")
                     self.c.sequence("R R")
                     cross_algorithm += " R R"
                 elif white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][2] == "B":
+                    print("Case 20 Found")
                     self.c.sequence("Ri Fi U F")
                     cross_algorithm += " Ri Fi U F"
                 # Final Cases for Orange and Yellow face....
                 # Case 11
                 if white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][1] == "B":
+                    print("Case 21 Found")
                     self.c.sequence("Ui Fi U F")
                     cross_algorithm += " Ui Fi U F"
                 elif white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][2] == "B":
+                    print("Case 22 Found")
                     self.c.sequence("Ui Ri")
                     cross_algorithm += " Ui Ri"
                 # Case 12
                 if white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][1] == "B":
+                    print("Case 23 Found")
                     self.c.sequence("Bi R R")
                     cross_algorithm += " Bi R R"
                 elif white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][2] == "B":
+                    print("Case 24 Found")
                     self.c.sequence("Bi Ri Fi U F")
                     cross_algorithm += " Bi Ri Fi U F"
-
                 white_pieces = self.findWhiteEdge()
             # -------------------------------------
             # Now Solving the White / Green Face
@@ -188,271 +213,348 @@ class SolveCube:
                 # Cases for blue/white being on GREEN Face
                 # Case 1 and 2
                 if white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][0] == "G":
+                    print("Case25 Found")
                     print("Correct Position No Algorithm")
                 elif white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][2] == "G":
+                    print("Case 26 Found")
                     self.c.sequence("L Fi D F")
                     cross_algorithm += " L Fi D F"
                 # Case 3 and 4
                 if white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][1] == "G":
+                    print("Case 27 Found")
                     self.c.sequence("F Ui Fi")
                     cross_algorithm += " F Ui Fi"
                 elif white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][0] == "G":
+                    print("Case 28 Found")
                     self.c.sequence("L")
                     cross_algorithm += " L"
                 # Case 5 and 6
                 if white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][0] == "G":
+                    print("Case 29 Found")
                     self.c.sequence("L L")
                     cross_algorithm += " L L"
                 elif white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][2] == "G":
+                    print("Case 30 Found")
                     self.c.sequence("Li Fi D F")
                     cross_algorithm += " Li Fi D F"
                 # Case 7 and 8
                 if white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][1] == "G":
+                    print("Case 31 Found")
                     self.c.sequence("Fi D F")
                     cross_algorithm += " Fi D F"
                 elif white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][0] == "G":
+                    print("Case 32 Found")
                     self.c.sequence("Li")
                     cross_algorithm += " Li"
                 # Case for green/white being on RED SIDE
                 # Case 9 and 10
                 if white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][2] == "G":
+                    print("Case 33 Found")
                     self.c.sequence("Di Li")
                     cross_algorithm += " Di Li"
                 elif white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][1] == "G":
+                    print("Case 34 Found")
                     self.c.sequence("D Fi Di F")
                     cross_algorithm += " D Fi Di F"
                 # Case 11 and 12
                 if white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][1] == "G":
+                    print("Case 35 Found")
                     self.c.sequence("Fi Di F")
                     cross_algorithm += " Fi Di F"
                 elif white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][0] == "G":
+                    print("Case 36 Found")
                     self.c.sequence("Fi Fi R F F")
                     cross_algorithm += " Fi Fi R F F"
                 # Case 13 and 14
                 if white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][2] == "G":
+                    print("Case 37 Found")
                     self.c.sequence("Bi Li Fi D F")
                     cross_algorithm += " Bi Li Fi D F"
                 elif white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][1] == "G":
+                    print("Case 38 Found")
                     self.c.sequence("Bi L L")
                     cross_algorithm += " Bi L L"
                 # Case for green/white being on BLUE SIDE
                 # Case 15 and 16
                 if white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][0] == "G":
+                    print("Case 39 Found")
                     self.c.sequence("Ri F F R F F")
                     cross_algorithm += " Ri F F R F F"
                 elif white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][2] == "G":
+                    print("Case 40 Found")
                     self.c.sequence("R F U Fi")
                     cross_algorithm += " R F U Fi"
                 # Case 17 and 18
                 if white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "G":
+                    print("Case 41 Found")
                     self.c.sequence("F U Fi")
                     cross_algorithm += " F U Fi"
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][0] == "G":
+                    print("Case 42 Found")
                     self.c.sequence("F F Ri F F")
                     cross_algorithm += " F F Ri F F"
                 # Case 19 and 20
                 if white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][0] == "G":
+                    print("Case 43 Found")
                     self.c.sequence("B B L L")
                     cross_algorithm += " B B L L"
                 elif white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][2] == "G":
+                    print("Case 44 Found")
                     self.c.sequence("B B Li Fi D F")
                     cross_algorithm += " B B Li Fi D F"
                 # Case 21 and 22
                 if white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][2] == "G":
+                    print("Case 45 Found")
                     self.c.sequence("B Li Fi D F")
                     cross_algorithm += " B Li Fi D F"
                 elif white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][1] == "G":
+                    print("Case 46 Found")
                     self.c.sequence("B L L")
                     cross_algorithm += " B L L"
                 # Final Case (22 and 24)
                 if white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][1] == "G":
+                    print("Case 47 Found")
                     self.c.sequence("U F Ui Fi")
                     cross_algorithm += " U F Ui Fi"
                 elif white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][2] == "G":
+                    print("Case 48 Found")
                     self.c.sequence("U L")
                     cross_algorithm += " U L"
-
                 white_pieces = self.findWhiteEdge()
             # -------------------------------------
             # Now Solving the White / Orange Face
             # -------------------------------------
-
             if "O" in white_pieces[val][0]:
                 # Case for White / Orange being on the GREEN FACE
                 if white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][0] == "O":
+                    print("Case 49 Found")
                     self.c.sequence("Fi L F")
                     cross_algorithm += " Fi L F"
                 elif white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][1] == "O":
+                    print("Case 50 Found")
                     self.c.sequence("Ui")
                     cross_algorithm += " Ui"
                 # Case 3 and 4
                 if white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][2] == "O":
+                    print("Case 51 Found")
                     self.c.sequence("Fi L F Ui")
                     cross_algorithm += " Fi L F Ui"
                 elif white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][0] == "O":
+                    print("Case 52 Found")
                     self.c.sequence("Bi U U")
                     cross_algorithm += " Bi U U"
                 # Case 5 and 6
                 if white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][0] == "O":
+                    print("Case 53 Found")
                     self.c.sequence("Fi Li F")
                     cross_algorithm += " Fi Li F"
                 elif white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][1] == "O":
+                    print("Case 54 Found")
                     self.c.sequence("F F D F F")
-                    cross_algorithm += " F F D D F F"
+                    cross_algorithm += " F F D F F"
                 # Case 7 and 8
                 if white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][2] == "O":
+                    print("Case 55 Found")
                     self.c.sequence("Li Ui")  # correct case'
                     cross_algorithm += " Li Ui"
                 elif white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][0] == "O":
+                    print("Case 56 Found")
                     self.c.sequence("L Fi Li F")
                     cross_algorithm += " L Fi Li F"
                 # White and Orange on RED FACE
                 # Case 9 and 10
                 if white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][1] == "O":
+                    print("Case 57 Found")
                     self.c.sequence("M M B B M M")
                     cross_algorithm += " M M B B M M"
                 elif white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][2] == "O":
+                    print("Case 58 Found")
                     self.c.sequence(" D F R Fi")
                     cross_algorithm += " D F R Fi"
                 # Case 11 and 12
                 if white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][0] == "O":
+                    print("Case 59 Found")
                     self.c.sequence("F R Fi")
                     cross_algorithm += " F R Fi"
                 elif white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][1] == "O":
+                    print("Case 60 Found")
                     self.c.sequence("F F Di F F")
                     cross_algorithm += " F F Di F F"
                 # Case 13 and 14
                 if white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][1] == "O":
+                    print("Case 61 Found")
                     self.c.sequence("B B U U")
                     cross_algorithm += " B B U U"
                 elif white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][2] == "O":
+                    print("Case 62 Found")
                     self.c.sequence("Di F R Fi")
                     cross_algorithm += " Di F R Fi"
                 # Case 15 and 16
                 # White and Orange on BLUE FACE
                 if white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][2] == "O":
+                    print("Case 63 Found")
                     self.c.sequence("R U")
                     cross_algorithm += " R U"
                 elif white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][0] == "O":
+                    print("Case 64 Found")
                     self.c.sequence("Ri F R Fi")
                     cross_algorithm += " Ri F R Fi"
                 # Case 17 and 18
                 if white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][0] == "O":
+                    print("Case 65 Found")
                     self.c.sequence("F Ri Fi")
                     cross_algorithm += " F Ri Fi"
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "O":
+                    print("Case 66 Found")
                     self.c.sequence("U")
                     cross_algorithm += " U"
                 # Case 19 and 20
                 if white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][0] == "O":
+                    print("Case 67 Found")
                     self.c.sequence("B U U")
                     cross_algorithm += " B U U"
                 elif white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][2] == "O":
+                    print("Case 68 Found")
                     self.c.sequence("Fi Ri F U")
                     cross_algorithm += " Fi Ri F U"
                 # Case 21 and 22
                 if white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][1] == "O":
+                    print("Case 69 Found")
                     print("Correct position")
                 elif white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][2] == "O":
+                    print("Case 70 Found")
                     self.c.sequence("U Fi L F")
                     cross_algorithm += " U Fi L F"
                 # Case 23 and 24
                 if white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][2] == "O":
+                    print("Case 71 Found")
                     self.c.sequence("Ui Fi L F")
                     cross_algorithm += " Ui Fi L F"
                 elif white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][1] == "O":
+                    print("Case 72 Found")
                     self.c.sequence("U U")
                     cross_algorithm += " U U"
 
             white_pieces = self.findWhiteEdge()
 
+            # -------------------------------------
+            # Now Solving the White / RED Face
+            # -------------------------------------
             if "R" in white_pieces[val][0]:
                 # Case for White / Orange being on the GREEN FACE
                 # Case 1 and 2
                 if white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][0] == "R":
+                    print("Case 73 Found")
                     self.c.sequence(" L F Li Fi")
                     cross_algorithm += " L F Li Fi"
                 elif white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][2] == "R":
+                    print("Case 74 Found")
                     self.c.sequence("L D")
                     cross_algorithm += " L D"
                 # Case 3 and 4
                 if white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][1] == "R":
+                    print("Case 75 Found")
                     self.c.sequence("F F Ui F F")
                     cross_algorithm += " F F Ui F F"
                 elif white_pieces[val][1] == (-1, 1, 0) and white_pieces[val][0][0] == "R":
+                    print("Case 76 Found")
                     self.c.sequence("F L Fi")
                     cross_algorithm += " F L Fi"
                 # Case 5 and 6
                 if white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][0] == "R":
+                    print("Case 77 Found")
                     self.c.sequence("B D D")
                     cross_algorithm += " B D D"
                 elif white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][2] == "R":
+                    print("Case 78 Found")
                     self.c.sequence(" B Di Fi R F")
                     cross_algorithm += " B Di Fi R F"
                 # Case 7 and 8
                 if white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][1] == "R":
+                    print("Case 79 Found")
                     self.c.sequence("D")
                     cross_algorithm += " D"
                 elif white_pieces[val][1] == (-1, -1, 0) and white_pieces[val][0][0] == "R":
+                    print("Case 80 Found")
                     self.c.sequence("F Li Fi")
                     cross_algorithm += " F Li Fi"
                 # Case 9 and 10
                 if white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][1] == "R":
+                    print("Case 81 Found")
                     print("No algorithm needed")
                 elif white_pieces[val][1] == (0, -1, 1) and white_pieces[val][0][2] == "R":
+                    print("Case 82 Found")
                     self.c.sequence("D Fi R F")
                     cross_algorithm += " D Fi R F"
                 # Case 11  and 12
                 if white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][0] == "R":
+                    print("Case 83 Found")
                     self.c.sequence("Fi R F")
                     cross_algorithm += " Fi R F"
                 elif white_pieces[val][1] == (1, -1, 0) and white_pieces[val][0][1] == "R":
+                    print("Case 84 Found")
                     self.c.sequence("Di")
                     cross_algorithm += " Di"
                 # Case 13 and 14
                 if white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][1] == "R":
+                    print("Case 85 Found")
                     self.c.sequence("D D")
                     cross_algorithm += " D D"
                 elif white_pieces[val][1] == (0, -1, -1) and white_pieces[val][0][2] == "R":
+                    print("Case 86 Found")
                     self.c.sequence("Di Fi R F")
                     cross_algorithm += " Di Fi R F"
                 # Case 15 and 16
                 if white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][0] == "R":
+                    print("Case 87 Found")
                     self.c.sequence("Ri Fi R F")
                     cross_algorithm += " Ri Fi R F"
                 elif white_pieces[val][1] == (1, 0, 1) and white_pieces[val][0][2] == "R":
+                    print("Case 88 Found")
                     self.c.sequence("Ri Di")
                     cross_algorithm += " Ri Di"
                 # Case 17 and 18
                 if white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "R":
+                    print("Case 89 Found")
                     self.c.sequence("F F U F F")
                     cross_algorithm += " F F U F F"
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][0] == "R":
+                    print("Case 90 Found")
                     self.c.sequence("Fi Ri F")
                     cross_algorithm += " Fi Ri F"
                 # Case 19 and 20
                 if white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][0] == "R":
+                    print("Case 91 Found")
                     self.c.sequence("Bi D D")
                     cross_algorithm += " Bi D D"
                 elif white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][2] == "R":
+                    print("Case 92 Found")
                     self.c.sequence("Bi Di Fi R F")
                     cross_algorithm += " Bi Di Fi R F"
                 # Case 21 and 22
                 if white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][1] == "R":
+                    print("Case 93 Found")
                     self.c.sequence("U U B B D D")
                     cross_algorithm += " U U B B D D"
                 elif white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][2] == "R":
+                    print("Case 94 Found")
                     self.c.sequence("U F F Ui F F")
                     cross_algorithm += " U F F Ui F F"
                 # Case 23 and 24 FINAL ONES IM SO HAPPY
                 if white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][2] == "R":
+                    print("Case 95 Found")
                     self.c.sequence("B B Di Fi R F")
                     cross_algorithm += " B B Di Fi R F"
                 elif white_pieces[val][1] == (0, 1, -1) and white_pieces[val][0][1] == "R":
+                    print("Case 96 Found")
                     self.c.sequence("B B D D")
                     cross_algorithm += " B B D D"
+
+            print("Cross White / RED = " + cross_algorithm)
             white_pieces = self.findWhiteEdge()
+
         print("White Cross Solved")
+        print(self.c)
         print("White Cross Algorithm = ", cross_algorithm)
         return cross_algorithm
 
@@ -675,6 +777,7 @@ class SolveCube:
                             currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
         print("Second Layer Solved")
         print("Second Layer Algorithm = " + second_layer_algorithm)
+
         return second_layer_algorithm
 
     def solveYellowCross(self):
@@ -770,8 +873,10 @@ class SolveCube:
         print("Yellow Cross Algorithm = " + yellow_cross_algorithm)
         return yellow_cross_algorithm
 
+    # Now we need to check if there are any cases... if not cannot solve.
     def orientLastLayer(self):
         # Cases
+        print(self.c)
         oll_algorithm = " "
 
         case_h = []
@@ -779,8 +884,10 @@ class SolveCube:
         case_headlights = []
         case_t = []
         case_bowtie = []
-
+        itter = 0
         for i in range(1, 5):
+            itter += 1
+            print("itter = " + str(itter))
             self.c.sequence("B")
             oll_algorithm += " B"
             # Anti Sune Case...
@@ -845,8 +952,9 @@ class SolveCube:
                 oll_algorithm += " Ri U R Di Ri Ui R D"
                 break
             else:
-                # No cases found
-                print()
+                if itter == 4:
+                    print("We couldn't find any cases....")
+                    return None
         print("OLL Solved")
         print("OLL Algorithm = " + oll_algorithm)
         return oll_algorithm
@@ -878,17 +986,37 @@ class SolveCube:
             elif self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]:
                 self.c.sequence("R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
                 final_corner_algorithm += " R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+            else:
+                print("No Cases Found..")
+                return None
         print("Final Corners Solved")
         print("Final Corners Algorithm = " + final_corner_algorithm)
         return final_corner_algorithm
 
     def solveFinalEdge(self):
+        print(self.c)
         solved_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
         final_edge_algorithm = " "
         if self.c == solved_cube:
             print("Cube Is Already Solved! (Skip Stage 7)")
+            return final_edge_algorithm
         # First Check is to check if any entire side matches (corner, edge, corner)
         else:
+            # check all values on yellow face == yellow
+
+            if (self.c.get_piece(1, 1, -1).colors[2] == "Y" and
+                    self.c.get_piece(0, 1, -1).colors[2] == "Y" and
+                    self.c.get_piece(-1, 1, -1).colors[2] == "Y" and
+                    self.c.get_piece(1, 0, -1).colors[2] == "Y" and
+                    self.c.get_piece(0, 0, -1).colors[2] == "Y" and
+                    self.c.get_piece(-1, 0, -1).colors[2] == "Y" and
+                    self.c.get_piece(1, -1, -1).colors[2] == "Y" and
+                    self.c.get_piece(0, -1, -1).colors[2] == "Y" and
+                    self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                print("All good")
+            else:
+                return None
+
             if (self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] ==
                     self.c.get_piece(0, 1, -1).colors[
                         1] == self.c.get_piece(0, 1, -1).colors[1] and
@@ -948,7 +1076,9 @@ class SolveCube:
                     while self.c.is_solved() == False:
                         self.c.sequence("B")
                         final_edge_algorithm += " B"
+            # No Line Found
             else:
+                print("no lINE found")
                 while self.c.get_piece(-1, 1, -1).colors[1] != "O":
                     self.c.sequence("B")
                     final_edge_algorithm += " B"
@@ -967,35 +1097,52 @@ class SolveCube:
                     while self.c.is_solved() == False:
                         self.c.sequence("B")
                         final_edge_algorithm += " B"
-        print("Final Edge Solved!")
-        print("Final Edge Algorithm = " + final_edge_algorithm)
-        return final_edge_algorithm
+
+            if self.c.is_solved():
+                print("Final Edge Solved!")
+                print("Final Edge Algorithm = " + final_edge_algorithm)
+                return final_edge_algorithm
+            else:
+                return None
+
+
 
     def solveCube(self):
         if self.c.is_solved():
             print("Cube Already Solved")
         else:
-                print("----------------------------------------------------------------------------------")
-                stage_1 = self.solveWhiteCross()
-                print("----------------------------------------------------------------------------------")
-                stage_2 = self.solveWhiteCorner()
-                print("----------------------------------------------------------------------------------")
-                stage_3 = self.solveSecondLayer()
-                print("----------------------------------------------------------------------------------")
-                stage_4 = self.solveYellowCross()
-                print("----------------------------------------------------------------------------------")
-                stage_5 = self.orientLastLayer()
+            print("----------------------------------------------------------------------------------")
+            stage_1 = self.solveWhiteCross()
+            print("----------------------------------------------------------------------------------")
+            stage_2 = self.solveWhiteCorner()
+            print("----------------------------------------------------------------------------------")
+            stage_3 = self.solveSecondLayer()
+            print("----------------------------------------------------------------------------------")
+            stage_4 = self.solveYellowCross()
+            print("----------------------------------------------------------------------------------")
+            stage_5 = self.orientLastLayer()
+            if stage_5 == None:
+                print("Error in OLL")
+                return None
+            else:
                 print("----------------------------------------------------------------------------------")
                 stage_6 = self.solveFinalCorners()
-                print("----------------------------------------------------------------------------------")
-                stage_7 = self.solveFinalEdge()
-                print("----------------------------------------------------------------------------------")
+                if stage_6 == None:
+                    print("Error in Final Corner")
+                    return None
+                else:
+                    print("----------------------------------------------------------------------------------")
+                    stage_7 = self.solveFinalEdge()
+                    if stage_7 == None:
+                        print("Error in Final Edge")
+                        return None
+                    else:
+                        print("----------------------------------------------------------------------------------")
+                        print(self.c)
+                        return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
 
-                return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
+#WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB
 
-
-# cube = Cube("OOOOOOWWWWWRBBBOYYGGGGGGWWRBBBOYYGGGWWRBBBOYYRRYRRYRRY")
-# S =SolveCube(cube)
-# print(S.c)
-# S.solveCube()
-# print(S.c)
+cube = Cube("WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB")
+S = SolveCube(cube)
+S.solveCube()
