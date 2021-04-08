@@ -45,7 +45,6 @@ class CubeScanner():
         bottom_middle_color = (255, 255, 255)
         bottom_right_color = (255, 255, 255)
 
-        window_name = cv2.namedWindow("Test")
 
         text = "Please Scan The " + face_list[face_index] + " Face"
 
@@ -193,6 +192,9 @@ class CubeScanner():
                 if face_index == 5:
                     text = "You have scanned your cube - exiting in 5 seconds"
                     rubiks_cube[face_index] = full_cube
+                    cv2.destroyAllWindows()
+                    for i in range(1, 5):
+                        cv2.waitKey(1)
                     return rubiks_cube
 
                 elif full_cube[1, 1] == face_list[face_index]:

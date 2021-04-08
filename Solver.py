@@ -12,7 +12,19 @@ class SolveCube:
             if piece.type == "edge":
                 if piece.colors[0] == "W" or piece.colors[1] == "W" or piece.colors[2] == "W":
                     white_piece.append([piece.colors, piece.pos])
-        return white_piece
+            # Return Ordered List --> BLUE / GREEN / ORANGE / RED (doesnt work)
+        list_copy = white_piece
+        print("Original White = ")
+        print(white_piece)
+        myorder = ['B', 'G', 'O', 'R']
+        mysortedlist = []
+        for colour in myorder:
+            for item in white_piece:
+                if colour in item[0]:
+                    mysortedlist.append(item)
+
+
+        return mysortedlist
 
     def findWhiteCorner(self):
         white_piece = []
@@ -69,7 +81,6 @@ class SolveCube:
                 new_algo += (" Li")
         return new_algo
 
-    # Main Solving Algorithms:
     def solveWhiteCross(self):
         white_pieces = self.findWhiteEdge()
         possible_faces = ["B", "G", "O", "R"]
@@ -80,15 +91,8 @@ class SolveCube:
         cross_algorithm = ""
         count = 1
         for val in range(len(white_pieces)):
+            print(self.c)
             print("Itter " + str(count + 1))
-            target_face = ""
-            target_location = ""
-
-            for face in range(len(possible_faces)):
-                if possible_faces[face] in white_pieces[val][0]:
-                    target_face = possible_faces[face]
-                    target_location = self.c.find_piece(possible_faces[face])
-
             # -------------------------------------
             # Now Solving the White / Blue Face
             # -------------------------------------
@@ -97,8 +101,9 @@ class SolveCube:
                 # Case 1 and 1a
                 if white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][2] == "B":
                     print("Case 1 Found")
-                    self.c.sequence("L D Fi")
-                    cross_algorithm += " L D Fi"
+                    # New Algorithm: L F D Fi
+                    self.c.sequence("L F D Fi")
+                    cross_algorithm += " L F D Fi"
                 elif white_pieces[val][1] == (-1, 0, 1) and white_pieces[val][0][0] == "B":
                     print("Case 2 Found")
                     self.c.sequence("L F F Li Fi Fi")
@@ -115,8 +120,10 @@ class SolveCube:
                 # Case 3 and 3a
                 if white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][2] == "B":
                     print("Case 5 Found")
-                    self.c.sequence("Bi Ui Fi L F F")
-                    cross_algorithm += " Bi Ui Fi L F F"
+                    # New = Bi Bi Ri FI U F
+                    # Old = Bi Ui Fi L F F
+                    self.c.sequence("Bi Bi Ri Fi U F")
+                    cross_algorithm += "Bi Bi Ri Fi U F"
                 elif white_pieces[val][1] == (-1, 0, -1) and white_pieces[val][0][0] == "B":
                     print("Case 6 Found")
                     self.c.sequence("Bi Bi R R")
@@ -171,7 +178,7 @@ class SolveCube:
                 if white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][0] == "B":
                     print("Case 17 Found")
                     self.c.sequence("Ri")
-                    cross_algorithm += " Ri"
+                    cross_algorithm += " Ri "
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "B":
                     print("Case 18 Found")
                     self.c.sequence("Fi U F")
@@ -407,7 +414,7 @@ class SolveCube:
                 elif white_pieces[val][1] == (1, 1, 0) and white_pieces[val][0][1] == "O":
                     print("Case 66 Found")
                     self.c.sequence("U")
-                    cross_algorithm += " U"
+                    cross_algorithm += " U "
                 # Case 19 and 20
                 if white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][0] == "O":
                     print("Case 67 Found")
@@ -415,8 +422,10 @@ class SolveCube:
                     cross_algorithm += " B U U"
                 elif white_pieces[val][1] == (1, 0, -1) and white_pieces[val][0][2] == "O":
                     print("Case 68 Found")
-                    self.c.sequence("Fi Ri F U")
-                    cross_algorithm += " Fi Ri F U"
+                    # Updated Algorithm: B Ui Fi L F
+                    # Old Algorithm: Fi Ri F U
+                    self.c.sequence("B Ui Fi L F")
+                    cross_algorithm += " B Ui Fi L F"
                 # Case 21 and 22
                 if white_pieces[val][1] == (0, 1, 1) and white_pieces[val][0][1] == "O":
                     print("Case 69 Found")
@@ -552,9 +561,8 @@ class SolveCube:
 
             print("Cross White / RED = " + cross_algorithm)
             white_pieces = self.findWhiteEdge()
-
+        print(white_pieces)
         print("White Cross Solved")
-        print(self.c)
         print("White Cross Algorithm = ", cross_algorithm)
         return cross_algorithm
 
@@ -565,220 +573,226 @@ class SolveCube:
 
         correct_positions = [(1, 1, 1), (1, -1, 1), (-1, 1, 1), (-1, -1, 1)]
         correct_arrangements = [['B', 'O', 'W'], ['B', 'R', 'W'], ['G', 'O', 'W'], ['G', 'R', 'W']]
+        try:
+            for val in range(len(whiteCorners)):
+                # First Check
+                # Checking if piece is on bottom row, else skip onto next step
 
-        for val in range(len(whiteCorners)):
-            # First Check
-            # Checking if piece is on bottom row, else skip onto next step
-
-            if whiteCorners[val][1] == (1, 1, 1):  # Doing
-                if whiteCorners[val][0] == correct_arrangements[0]:
-                    print(correct_arrangements[val], " piece In Correct Location")
-                else:
-                    self.c.sequence("R B Ri Bi")
-                    whiteCornersAlgorithm += " R B Ri Bi"
-                    whiteCorners = self.findWhiteCorner()
-            if whiteCorners[val][1] == (1, -1, 1):
-                if whiteCorners[val][0] == correct_arrangements[1]:
-                    print(correct_arrangements[val], " piece In Correct Location")
-                else:
-                    self.c.sequence("Ri Bi R B")
-                    whiteCornersAlgorithm += " Ri Bi R B"
-                    whiteCorners = self.findWhiteCorner()
-            if whiteCorners[val][1] == (-1, 1, 1):
-                if whiteCorners[val][0] == correct_arrangements[2]:
-                    print(correct_arrangements[val], " piece In Correct Location")
-                else:
-                    self.c.sequence("Li Bi L B")
-                    whiteCornersAlgorithm += " Li Bi L B"
-                    whiteCorners = self.findWhiteCorner()
-            if whiteCorners[val][1] == (-1, -1, 1):
-                if whiteCorners[val][0] == correct_arrangements[3]:
-                    print(correct_arrangements[val], " piece In Correct Location")
-                else:
-                    self.c.sequence("L B Li Bi")
-                    whiteCornersAlgorithm += " L B Li Bi"
-                    whiteCorners = self.findWhiteCorner()
-
-            # Second Section
-            if whiteCorners[val][1][2] == -1:
-                if set(whiteCorners[val][0]).issubset(['W', 'O', 'B']):
-                    while whiteCorners[val][1] != (1, 1, -1):
-                        self.c.sequence("B")
-                        whiteCornersAlgorithm += " B"
-                        whiteCorners = self.findWhiteCorner()
-                        if whiteCorners[val][1] == (1, 1, -1):
-                            whiteCorners = self.findWhiteCorner()
-                    while whiteCorners[val][1] != (1, 1, 1) or whiteCorners[val][0] != ['B', 'O', 'W']:
+                if whiteCorners[val][1] == (1, 1, 1):  # Doing
+                    if whiteCorners[val][0] == correct_arrangements[0]:
+                        print(correct_arrangements[val], " piece In Correct Location")
+                    else:
                         self.c.sequence("R B Ri Bi")
                         whiteCornersAlgorithm += " R B Ri Bi"
                         whiteCorners = self.findWhiteCorner()
-                if set(whiteCorners[val][0]).issubset(['W', 'R', 'B']):
-                    while whiteCorners[val][1] != (1, -1, -1):
-                        self.c.sequence("B")
-                        whiteCornersAlgorithm += " B"
+                if whiteCorners[val][1] == (1, -1, 1):
+                    if whiteCorners[val][0] == correct_arrangements[1]:
+                        print(correct_arrangements[val], " piece In Correct Location")
+                    else:
+                        self.c.sequence("Ri Bi R B")
+                        whiteCornersAlgorithm += " Ri Bi R B"
                         whiteCorners = self.findWhiteCorner()
-                        if whiteCorners[val][1] == (1, -1, -1):
-                            whiteCorners = self.findWhiteCorner()
-                    while whiteCorners[val][1] != (1, -1, 1) or whiteCorners[val][0] != ['B', 'R', 'W']:
-                        self.c.sequence("D B Di Bi")
-                        whiteCornersAlgorithm += " D B Di Bi"
-                        whiteCorners = self.findWhiteCorner()
-                if set(whiteCorners[val][0]).issubset(['W', 'G', 'O']):
-                    while whiteCorners[val][1] != (-1, 1, -1):
-                        self.c.sequence("B")
-                        whiteCornersAlgorithm += " B"
-                        whiteCorners = self.findWhiteCorner()
-                        if whiteCorners[val][1] == (-1, 1, -1):
-                            whiteCorners = self.findWhiteCorner()
-                    while whiteCorners[val][1] != (-1, 1, 1) or whiteCorners[val][0] != ['G', 'O', 'W']:
+                if whiteCorners[val][1] == (-1, 1, 1):
+                    if whiteCorners[val][0] == correct_arrangements[2]:
+                        print(correct_arrangements[val], " piece In Correct Location")
+                    else:
                         self.c.sequence("Li Bi L B")
                         whiteCornersAlgorithm += " Li Bi L B"
                         whiteCorners = self.findWhiteCorner()
-                if set(whiteCorners[val][0]).issubset(['W', 'G', 'R']):
-                    while whiteCorners[val][1] != (-1, -1, -1):
-                        self.c.sequence("B")
-                        whiteCornersAlgorithm += " B"
-                        whiteCorners = self.findWhiteCorner()
-                        if whiteCorners[val][1] == (-1, -1, -1):
-                            whiteCorners = self.findWhiteCorner()
-                    while whiteCorners[val][1] != (-1, -1, 1) or whiteCorners[val][0] != ['G', 'R', 'W']:
+                if whiteCorners[val][1] == (-1, -1, 1):
+                    if whiteCorners[val][0] == correct_arrangements[3]:
+                        print(correct_arrangements[val], " piece In Correct Location")
+                    else:
                         self.c.sequence("L B Li Bi")
                         whiteCornersAlgorithm += " L B Li Bi"
                         whiteCorners = self.findWhiteCorner()
-        print("White Corner Solved")
-        print("White Corner Algorithm = " + whiteCornersAlgorithm)
-        return whiteCornersAlgorithm
+
+                # Second Section
+                if whiteCorners[val][1][2] == -1:
+                    if set(whiteCorners[val][0]).issubset(['W', 'O', 'B']):
+                        while whiteCorners[val][1] != (1, 1, -1):
+                            self.c.sequence("B")
+                            whiteCornersAlgorithm += " B"
+                            whiteCorners = self.findWhiteCorner()
+                            if whiteCorners[val][1] == (1, 1, -1):
+                                whiteCorners = self.findWhiteCorner()
+                        while whiteCorners[val][1] != (1, 1, 1) or whiteCorners[val][0] != ['B', 'O', 'W']:
+                            self.c.sequence("R B Ri Bi")
+                            whiteCornersAlgorithm += " R B Ri Bi"
+                            whiteCorners = self.findWhiteCorner()
+                    if set(whiteCorners[val][0]).issubset(['W', 'R', 'B']):
+                        while whiteCorners[val][1] != (1, -1, -1):
+                            self.c.sequence("B")
+                            whiteCornersAlgorithm += " B"
+                            whiteCorners = self.findWhiteCorner()
+                            if whiteCorners[val][1] == (1, -1, -1):
+                                whiteCorners = self.findWhiteCorner()
+                        while whiteCorners[val][1] != (1, -1, 1) or whiteCorners[val][0] != ['B', 'R', 'W']:
+                            self.c.sequence("D B Di Bi")
+                            whiteCornersAlgorithm += " D B Di Bi"
+                            whiteCorners = self.findWhiteCorner()
+                    if set(whiteCorners[val][0]).issubset(['W', 'G', 'O']):
+                        while whiteCorners[val][1] != (-1, 1, -1):
+                            self.c.sequence("B")
+                            whiteCornersAlgorithm += " B"
+                            whiteCorners = self.findWhiteCorner()
+                            if whiteCorners[val][1] == (-1, 1, -1):
+                                whiteCorners = self.findWhiteCorner()
+                        while whiteCorners[val][1] != (-1, 1, 1) or whiteCorners[val][0] != ['G', 'O', 'W']:
+                            self.c.sequence("Li Bi L B")
+                            whiteCornersAlgorithm += " Li Bi L B"
+                            whiteCorners = self.findWhiteCorner()
+                    if set(whiteCorners[val][0]).issubset(['W', 'G', 'R']):
+                        while whiteCorners[val][1] != (-1, -1, -1):
+                            self.c.sequence("B")
+                            whiteCornersAlgorithm += " B"
+                            whiteCorners = self.findWhiteCorner()
+                            if whiteCorners[val][1] == (-1, -1, -1):
+                                whiteCorners = self.findWhiteCorner()
+                        while whiteCorners[val][1] != (-1, -1, 1) or whiteCorners[val][0] != ['G', 'R', 'W']:
+                            self.c.sequence("L B Li Bi")
+                            whiteCornersAlgorithm += " L B Li Bi"
+                            whiteCorners = self.findWhiteCorner()
+            print("White Corner Solved")
+            print("White Corner Algorithm = " + whiteCornersAlgorithm)
+            return whiteCornersAlgorithm
+        except:
+            return None
 
     def solveSecondLayer(self):
         second_layer_algorithm = " "
         whiteCorners = self.findWhiteCorner()
         order = ["First - Blue/White/Orange", "Second - Blue/White/Red", "Third - Green/Orange/White",
                  "Fourth - Green/Red/White"]
-        for val in range(len(whiteCorners)):
-            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-            # Third index being 0 means they sit in the same level... middle layer...
-            if currentEdgePiece[0][1] == (1, 1, 0):
-                # Check if in correct place...
-                if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]) and currentEdgePiece[0][0] == ["B", "O",
-                                                                                                         None]:
-                    print("piece in correct location")
-                else:
-                    self.c.sequence("R B Ri Bi Ui Bi U B")
-                    currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    second_layer_algorithm += " R B Ri Bi Ui Bi U B"
-            if currentEdgePiece[0][1] == (1, -1, 0):
-                if set(currentEdgePiece[0][0]).issubset(['B', 'R', None]) and currentEdgePiece[0][0] == ['B', 'R',
-                                                                                                         None]:
-                    print("piece in correct location")
-                else:
-                    self.c.sequence("D B Di Bi Ri Bi R B")
-                    currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    second_layer_algorithm += " D B Di Bi Ri Bi R B"
-            if currentEdgePiece[0][1] == (-1, 1, 0):
-                if set(currentEdgePiece[0][0]).issubset(['G', 'O', None]) and currentEdgePiece[0][0] == ['G', 'O',
-                                                                                                         None]:
-                    print("piece in correct location")
-                else:
-                    self.c.sequence("Li Bi L B U B Ui Bi")
-                    currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    second_layer_algorithm += " Li Bi L B U B Ui Bi"
-            if currentEdgePiece[0][1] == (-1, -1, 0):
-                if set(currentEdgePiece[0][0]).issubset(['G', 'R', None]) and currentEdgePiece[0][0] == ['G', 'R',
-                                                                                                         None]:
-                    print("piece in correct location")
-                else:
-                    self.c.sequence("L B Li Bi Di Bi D B")
-                    currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    second_layer_algorithm += " L B Li Bi Di Bi D B"
-            if currentEdgePiece[0][1][2] == -1:
-                # Under the assumption that the white corner piece is in the correct place
-                if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]):
-                    if currentEdgePiece[0][0] == ["B", None, "O"] or currentEdgePiece[0][0] == [None, "B", "O"]:
-                        # Target needs to be (0,-1,-1)
-                        while currentEdgePiece[0][1] != (0, -1, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (0, -1, -1):
-                            self.c.sequence("Ui Bi U B R B Ri Bi")
-                            second_layer_algorithm += " Ui Bi U B R B Ri Bi"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    if currentEdgePiece[0][0] == [None, "O", "B"] or currentEdgePiece[0][0] == ["O", None, "B"]:
-                        while currentEdgePiece[0][1] != (-1, 0, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (-1, 0, -1):
-                            self.c.sequence("R B Ri Bi Ui Bi U B")
-                            second_layer_algorithm += " R B Ri Bi Ui Bi U B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                if set(currentEdgePiece[0][0]).issubset(['B', 'R', None]):
-                    if currentEdgePiece[0][0] == ["B", None, "R"] or currentEdgePiece[0][0] == [None, "B", "R"]:
-                        # Target needs to be (0,1,-1)
-                        while currentEdgePiece[0][1] != (0, 1, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (0, 1, -1):
-                            self.c.sequence("D B Di Bi Ri Bi R B")
-                            second_layer_algorithm += " D B Di Bi Ri Bi R B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    if currentEdgePiece[0][0] == [None, "R", "B"] or currentEdgePiece[0][0] == ["R", None, "B"]:
-                        while currentEdgePiece[0][1] != (-1, 0, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (-1, 0, -1):
-                            self.c.sequence("Ri Bi R B D B Di Bi")
-                            second_layer_algorithm += " Ri Bi R B D B Di Bi"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                if set(currentEdgePiece[0][0]).issubset(['G', 'O', None]):
-                    if currentEdgePiece[0][0] == ["O", None, "G"] or currentEdgePiece[0][0] == [None, "O", "G"]:
-                        # Target needs to be (1,0,-1)
-                        while currentEdgePiece[0][1] != (1, 0, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (1, 0, -1):
-                            self.c.sequence("Li Bi L B U B Ui B")
-                            second_layer_algorithm += " Li Bi L B U B Ui B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    if currentEdgePiece[0][0] == [None, "G", "O"] or currentEdgePiece[0][0] == ["G", None, "O"]:
-                        # Target needs to be (1,0,-1)
-                        while currentEdgePiece[0][1] != (0, -1, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (0, -1, -1):
-                            self.c.sequence("U B Ui Bi Li Bi L B")
-                            second_layer_algorithm += " U B Ui Bi Li Bi L B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                if set(currentEdgePiece[0][0]).issubset(['G', 'R', None]):
-                    if currentEdgePiece[0][0] == ["R", None, "G"] or currentEdgePiece[0][0] == [None, "R", "G"]:
-                        # Target  = (1,0,-1)
-                        while currentEdgePiece[0][1] != (1, 0, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (1, 0, -1):
-                            self.c.sequence("L B Li Bi Di Bi D B")
-                            second_layer_algorithm += " L B Li Bi Di Bi D B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                    if currentEdgePiece[0][0] == [None, "G", "R"] or currentEdgePiece[0][0] == ["G", None, "R"]:
-                        # Target Location = 0,1,-1
-                        while currentEdgePiece[0][1] != (0, 1, -1):
-                            self.c.sequence("B")
-                            second_layer_algorithm += " B"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-                        if currentEdgePiece[0][1] == (0, 1, -1):
-                            # c.sequence("D B Di Bi Ri Bi R B")
-                            self.c.sequence("Di Bi D B L B Li Bi")
-                            second_layer_algorithm += " Di Bi D B L B Li Bi"
-                            currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
-        print("Second Layer Solved")
-        print("Second Layer Algorithm = " + second_layer_algorithm)
+        try:
+            for val in range(len(whiteCorners)):
+                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                # Third index being 0 means they sit in the same level... middle layer...
+                if currentEdgePiece[0][1] == (1, 1, 0):
+                    # Check if in correct place...
+                    if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]) and currentEdgePiece[0][0] == ["B", "O",
+                                                                                                             None]:
+                        print("piece in correct location")
+                    else:
+                        self.c.sequence("R B Ri Bi Ui Bi U B")
+                        currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        second_layer_algorithm += " R B Ri Bi Ui Bi U B"
+                if currentEdgePiece[0][1] == (1, -1, 0):
+                    if set(currentEdgePiece[0][0]).issubset(['B', 'R', None]) and currentEdgePiece[0][0] == ['B', 'R',
+                                                                                                             None]:
+                        print("piece in correct location")
+                    else:
+                        self.c.sequence("D B Di Bi Ri Bi R B")
+                        currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        second_layer_algorithm += " D B Di Bi Ri Bi R B"
+                if currentEdgePiece[0][1] == (-1, 1, 0):
+                    if set(currentEdgePiece[0][0]).issubset(['G', 'O', None]) and currentEdgePiece[0][0] == ['G', 'O',
+                                                                                                             None]:
+                        print("piece in correct location")
+                    else:
+                        self.c.sequence("Li Bi L B U B Ui Bi")
+                        currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        second_layer_algorithm += " Li Bi L B U B Ui Bi"
+                if currentEdgePiece[0][1] == (-1, -1, 0):
+                    if set(currentEdgePiece[0][0]).issubset(['G', 'R', None]) and currentEdgePiece[0][0] == ['G', 'R',
+                                                                                                             None]:
+                        print("piece in correct location")
+                    else:
+                        self.c.sequence("L B Li Bi Di Bi D B")
+                        currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        second_layer_algorithm += " L B Li Bi Di Bi D B"
+                if currentEdgePiece[0][1][2] == -1:
+                    # Under the assumption that the white corner piece is in the correct place
+                    if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]):
+                        if currentEdgePiece[0][0] == ["B", None, "O"] or currentEdgePiece[0][0] == [None, "B", "O"]:
+                            # Target needs to be (0,-1,-1)
+                            while currentEdgePiece[0][1] != (0, -1, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (0, -1, -1):
+                                self.c.sequence("Ui Bi U B R B Ri Bi")
+                                second_layer_algorithm += " Ui Bi U B R B Ri Bi"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        if currentEdgePiece[0][0] == [None, "O", "B"] or currentEdgePiece[0][0] == ["O", None, "B"]:
+                            while currentEdgePiece[0][1] != (-1, 0, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (-1, 0, -1):
+                                self.c.sequence("R B Ri Bi Ui Bi U B")
+                                second_layer_algorithm += " R B Ri Bi Ui Bi U B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                    if set(currentEdgePiece[0][0]).issubset(['B', 'R', None]):
+                        if currentEdgePiece[0][0] == ["B", None, "R"] or currentEdgePiece[0][0] == [None, "B", "R"]:
+                            # Target needs to be (0,1,-1)
+                            while currentEdgePiece[0][1] != (0, 1, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (0, 1, -1):
+                                self.c.sequence("D B Di Bi Ri Bi R B")
+                                second_layer_algorithm += " D B Di Bi Ri Bi R B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        if currentEdgePiece[0][0] == [None, "R", "B"] or currentEdgePiece[0][0] == ["R", None, "B"]:
+                            while currentEdgePiece[0][1] != (-1, 0, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (-1, 0, -1):
+                                self.c.sequence("Ri Bi R B D B Di Bi")
+                                second_layer_algorithm += " Ri Bi R B D B Di Bi"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                    if set(currentEdgePiece[0][0]).issubset(['G', 'O', None]):
+                        if currentEdgePiece[0][0] == ["O", None, "G"] or currentEdgePiece[0][0] == [None, "O", "G"]:
+                            # Target needs to be (1,0,-1)
+                            while currentEdgePiece[0][1] != (1, 0, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (1, 0, -1):
+                                self.c.sequence("Li Bi L B U B Ui B")
+                                second_layer_algorithm += " Li Bi L B U B Ui B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        if currentEdgePiece[0][0] == [None, "G", "O"] or currentEdgePiece[0][0] == ["G", None, "O"]:
+                            # Target needs to be (1,0,-1)
+                            while currentEdgePiece[0][1] != (0, -1, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (0, -1, -1):
+                                self.c.sequence("U B Ui Bi Li Bi L B")
+                                second_layer_algorithm += " U B Ui Bi Li Bi L B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                    if set(currentEdgePiece[0][0]).issubset(['G', 'R', None]):
+                        if currentEdgePiece[0][0] == ["R", None, "G"] or currentEdgePiece[0][0] == [None, "R", "G"]:
+                            # Target  = (1,0,-1)
+                            while currentEdgePiece[0][1] != (1, 0, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (1, 0, -1):
+                                self.c.sequence("L B Li Bi Di Bi D B")
+                                second_layer_algorithm += " L B Li Bi Di Bi D B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        if currentEdgePiece[0][0] == [None, "G", "R"] or currentEdgePiece[0][0] == ["G", None, "R"]:
+                            # Target Location = 0,1,-1
+                            while currentEdgePiece[0][1] != (0, 1, -1):
+                                self.c.sequence("B")
+                                second_layer_algorithm += " B"
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            if currentEdgePiece[0][1] == (0, 1, -1):
+                                # c.sequence("D B Di Bi Ri Bi R B")
+                                self.c.sequence("Di Bi D B L B Li Bi")
+                                second_layer_algorithm += " Di Bi D B L B Li Bi"
 
-        return second_layer_algorithm
+                                currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+            print("Second Layer Solved")
+            print("Second Layer Algorithm = " + second_layer_algorithm)
+            return second_layer_algorithm
+        except:
+            print("An error occured on second layer (F2L)")
+            return None
 
     def solveYellowCross(self):
         # If Y == 2nd index - yellow is pointing up
@@ -828,170 +842,180 @@ class SolveCube:
             self.c.get_piece(0, 0, -1).colors[2] == "Y",
             self.c.get_piece(-1, 0, -1).colors[2] == "Y"]
 
-        if all(yellowCrossSolved):
-            print("The Yellow Cross Is Already Solved...")
-        # Conditions For Line Found
-        elif all(line_condition_one) or all(line_condition_two):
-            if line_condition_two == [True, True, True]:
-                algorithm = "F R U Ri Ui Fi"
-                newAlgo = self.convertAlgo(algorithm)
-                yellow_cross_algorithm += newAlgo
-                self.c.sequence(newAlgo)
-            elif line_condition_one == [True, True, True]:
-                if line_condition_one == [True, True, True]:
-                    self.c.sequence("B")
-                    yellow_cross_algorithm += " B"
+        try:
+            if all(yellowCrossSolved):
+                print("The Yellow Cross Is Already Solved...")
+            # Conditions For Line Found
+            elif all(line_condition_one) or all(line_condition_two):
+                if line_condition_two == [True, True, True]:
                     algorithm = "F R U Ri Ui Fi"
                     newAlgo = self.convertAlgo(algorithm)
                     yellow_cross_algorithm += newAlgo
                     self.c.sequence(newAlgo)
-        # Conditions for L found -
-        elif all(l_condition_one) or all(l_condition_two) or all(l_condition_three) or all(
-                l_condition_four) and not all(yellowCrossSolved):
-            if l_condition_two == [True, True, True]:
+                elif line_condition_one == [True, True, True]:
+                    if line_condition_one == [True, True, True]:
+                        self.c.sequence("B")
+                        yellow_cross_algorithm += " B"
+                        algorithm = "F R U Ri Ui Fi"
+                        newAlgo = self.convertAlgo(algorithm)
+                        yellow_cross_algorithm += newAlgo
+                        self.c.sequence(newAlgo)
+            # Conditions for L found -
+            elif all(l_condition_one) or all(l_condition_two) or all(l_condition_three) or all(
+                    l_condition_four) and not all(yellowCrossSolved):
+                if l_condition_two == [True, True, True]:
+                    self.c.sequence("D B L Bi Li Di")
+                    yellow_cross_algorithm += " D B L Bi Li Di"
+                elif not l_condition_two == [True, True, True]:
+                    if l_condition_one == [True, True, True]:
+                        self.c.sequence("Bi D B L Bi Li Di")
+                        yellow_cross_algorithm += " Bi D B L Bi Li Di"
+                    elif l_condition_three == [True, True, True]:
+                        self.c.sequence("B D B L Bi Li Di")
+                        yellow_cross_algorithm += " B D B L Bi Li Di"
+                    elif l_condition_four == [True, True, True]:
+                        self.c.sequence("B B D B L Bi Li Di")
+                        yellow_cross_algorithm += " B B D B L Bi Li Di"
+            # Dot Scenorio
+            elif (not all(l_condition_one) and not all(l_condition_two) and not all(l_condition_three) and not all(
+                    l_condition_four)
+                  and not all(yellowCrossSolved)
+                  and not all(line_condition_two) and not all(line_condition_one)):
+                self.c.sequence("U R B Ri Bi Ui")
                 self.c.sequence("D B L Bi Li Di")
-                yellow_cross_algorithm += " D B L Bi Li Di"
-            elif not l_condition_two == [True, True, True]:
-                if l_condition_one == [True, True, True]:
-                    self.c.sequence("Bi D B L Bi Li Di")
-                    yellow_cross_algorithm += " Bi D B L Bi Li Di"
-                elif l_condition_three == [True, True, True]:
-                    self.c.sequence("B D B L Bi Li Di")
-                    yellow_cross_algorithm += " B D B L Bi Li Di"
-                elif l_condition_four == [True, True, True]:
-                    self.c.sequence("B B D B L Bi Li Di")
-                    yellow_cross_algorithm += " B B D B L Bi Li Di"
-        # Dot Scenorio
-        elif (not all(l_condition_one) and not all(l_condition_two) and not all(l_condition_three) and not all(
-                l_condition_four)
-              and not all(yellowCrossSolved)
-              and not all(line_condition_two) and not all(line_condition_one)):
-            self.c.sequence("U R B Ri Bi Ui")
-            self.c.sequence("D B L Bi Li Di")
-            yellow_cross_algorithm += " U R B Ri Bi Ui D B L Bi Li Di"
-        print("Yellow Cross Solved")
-        print("Yellow Cross Algorithm = " + yellow_cross_algorithm)
-        return yellow_cross_algorithm
+                yellow_cross_algorithm += " U R B Ri Bi Ui D B L Bi Li Di"
+            print("Yellow Cross Solved")
+            print("Yellow Cross Algorithm = " + yellow_cross_algorithm)
+            return yellow_cross_algorithm
+        except:
+            return None
 
-    # Now we need to check if there are any cases... if not cannot solve.
     def orientLastLayer(self):
         # Cases
         print(self.c)
         oll_algorithm = " "
-
-        case_h = []
-        case_pi = []
-        case_headlights = []
-        case_t = []
-        case_bowtie = []
-        itter = 0
-        for i in range(1, 5):
-            itter += 1
-            print("itter = " + str(itter))
-            self.c.sequence("B")
-            oll_algorithm += " B"
-            # Anti Sune Case...
-            if (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
-                    self.c.get_piece(-1, -1, -1).colors[0] == "Y" and
-                    self.c.get_piece(1, -1, -1).colors[1] == "Y" and
-                    self.c.get_piece(1, 1, -1).colors[2] == "Y" and
-                    self.c.get_piece(0, 1, -1).colors[2] == "Y" and
-                    self.c.get_piece(1, 0, -1).colors[2] == "Y" and
-                    self.c.get_piece(0, 0, -1).colors[2] == "Y" and
-                    self.c.get_piece(-1, 0, -1).colors[2] == "Y" and
-                    self.c.get_piece(0, -1, -1).colors[2] == "Y"):
-                self.c.sequence("Li Bi L Bi Li B B L")
-                oll_algorithm += " Li Bi L Bi Li B B L"
-                break
-            # Sune Case...
-            elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[0] == "Y" and
-                  self.c.get_piece(-1, 1, -1).colors[2] == "Y"):
-                self.c.sequence("R B Ri B R B B Ri")
-                oll_algorithm += " R B Ri B R B B Ri"
-                break
-            # Headlights Case
-            elif (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[2] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
-                self.c.sequence("R R F Ri B B R Fi Ri B B Ri")
-                oll_algorithm += " R R F Ri B B R Fi Ri B B Ri"
-                break
-            # H Case
-            elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[1] == "Y"):
-                self.c.sequence("U R B Ri Bi R B Ri Bi R B Ri Bi Ui")
-                oll_algorithm += " U R B Ri Bi R B Ri Bi R B Ri Bi Ui"
-                break
-            # Pi Case
-            elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[1] == "Y" and
-                  self.c.get_piece(-1, 1, -1).colors[0] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[0] == "Y"):
-                self.c.sequence("R B B Ri Ri Bi R R Bi Ri Ri B B R")
-                oll_algorithm += " R B B Ri Ri Bi R R Bi Ri Ri B B R"
-                break
-            # T Case
-            elif (self.c.get_piece(1, 1, -1).colors[2] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[2] == "Y" and
-                  self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[1] == "Y"):
-                self.c.sequence("L U Ri Ui Li U R Ui")
-                oll_algorithm += " L U Ri Ui Li U R Ui"
-                break
-            # Bow-Tie Case
-            elif (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
-                  self.c.get_piece(1, -1, -1).colors[0] == "Y" and
-                  self.c.get_piece(1, 1, -1).colors[2] == "Y" and
-                  self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
-                self.c.sequence("Ri U R Di Ri Ui R D")
-                oll_algorithm += " Ri U R Di Ri Ui R D"
-                break
-            else:
-                if itter == 4:
-                    print("We couldn't find any cases....")
-                    return None
-        print("OLL Solved")
-        print("OLL Algorithm = " + oll_algorithm)
-        return oll_algorithm
+        # # Check Full Yellow Face
+        if self.c.is_solved():
+            return oll_algorithm
+        else:
+            itter = 0
+            for i in range(1, 5):
+                itter += 1
+                print("itter = " + str(itter))
+                self.c.sequence("B")
+                oll_algorithm += " B"
+                # Anti Sune Case...
+                if (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
+                        self.c.get_piece(-1, -1, -1).colors[0] == "Y" and
+                        self.c.get_piece(1, -1, -1).colors[1] == "Y" and
+                        self.c.get_piece(1, 1, -1).colors[2] == "Y" and
+                        self.c.get_piece(0, 1, -1).colors[2] == "Y" and
+                        self.c.get_piece(1, 0, -1).colors[2] == "Y" and
+                        self.c.get_piece(0, 0, -1).colors[2] == "Y" and
+                        self.c.get_piece(-1, 0, -1).colors[2] == "Y" and
+                        self.c.get_piece(0, -1, -1).colors[2] == "Y"):
+                    self.c.sequence("Li Bi L Bi Li B B L")
+                    oll_algorithm += " Li Bi L Bi Li B B L"
+                    break
+                # Sune Case...
+                elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[0] == "Y" and
+                      self.c.get_piece(-1, 1, -1).colors[2] == "Y"):
+                    self.c.sequence("R B Ri B R B B Ri")
+                    oll_algorithm += " R B Ri B R B B Ri"
+                    break
+                # Headlights Case
+                elif (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[2] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                    self.c.sequence("R R F Ri B B R Fi Ri B B Ri")
+                    oll_algorithm += " R R F Ri B B R Fi Ri B B Ri"
+                    break
+                # H Case
+                elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[1] == "Y"):
+                    self.c.sequence("U R B Ri Bi R B Ri Bi R B Ri Bi Ui")
+                    oll_algorithm += " U R B Ri Bi R B Ri Bi R B Ri Bi Ui"
+                    break
+                # Pi Case
+                elif (self.c.get_piece(1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[1] == "Y" and
+                      self.c.get_piece(-1, 1, -1).colors[0] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[0] == "Y"):
+                    self.c.sequence("R B B Ri Ri Bi R R Bi Ri Ri B B R")
+                    oll_algorithm += " R B B Ri Ri Bi R R Bi Ri Ri B B R"
+                    break
+                # T Case
+                elif (self.c.get_piece(1, 1, -1).colors[2] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[2] == "Y" and
+                      self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[1] == "Y"):
+                    self.c.sequence("L U Ri Ui Li U R Ui")
+                    oll_algorithm += " L U Ri Ui Li U R Ui"
+                    break
+                # Bow-Tie Case
+                elif (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
+                      self.c.get_piece(1, -1, -1).colors[0] == "Y" and
+                      self.c.get_piece(1, 1, -1).colors[2] == "Y" and
+                      self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                    self.c.sequence("Ri U R Di Ri Ui R D")
+                    oll_algorithm += " Ri U R Di Ri Ui R D"
+                    break
+                # OLL Already Solved (Yellow Face comeple)
+                elif (self.c.get_piece(1, 1, -1).colors[2] and self.c.get_piece(0, 1, -1).colors[2] and
+                    self.c.get_piece(-1, 1, -1).colors[2] and self.c.get_piece(1, 0, -1).colors[2] and
+                    self.c.get_piece(0, 0, -1).colors[2] and self.c.get_piece(-1, 0, -1).colors[2] and
+                    self.c.get_piece(1, -1, -1).colors[2] and self.c.get_piece(0, -1, -1).colors[2] and
+                    self.c.get_piece(-1, -1, -1).colors[2]) == "Y":
+                    oll_algorithm += ""
+                else:
+                    if itter == 4:
+                        print("We couldn't find any cases....")
+                        return None
+            print("OLL Solved")
+            print("OLL Algorithm = " + oll_algorithm)
+            return oll_algorithm
 
     def solveFinalCorners(self):
         final_corner_algorithm = ""
-        # First check if all corner's match each other:
-        if (self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] and
-                self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] and
-                self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] and
-                self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]):
-            print("")
-        elif (self.c.get_piece(-1, 1, -1).colors[1] != self.c.get_piece(1, 1, -1).colors[1] and
-              self.c.get_piece(1, 1, -1).colors[0] != self.c.get_piece(1, -1, -1).colors[0] and
-              self.c.get_piece(1, -1, -1).colors[1] != self.c.get_piece(-1, -1, -1).colors[1] and
-              self.c.get_piece(-1, 1, -1).colors[0] != self.c.get_piece(-1, -1, -1).colors[0]):
-            self.c.sequence("U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui")
-            final_corner_algorithm += " U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui"
+        if self.c.is_solved():
+            return final_corner_algorithm
         else:
-            if self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1]:
-                self.c.sequence("B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
-                final_corner_algorithm += " B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
-            elif self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0]:
-                self.c.sequence("B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
-                final_corner_algorithm += " B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
-            elif self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1]:
-                self.c.sequence("Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
-                final_corner_algorithm += " Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
-            elif self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]:
-                self.c.sequence("R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
-                final_corner_algorithm += " R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+            # First check if all corner's match each other:
+            if (self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] and
+                    self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] and
+                    self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] and
+                    self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]):
+                print("")
+            elif (self.c.get_piece(-1, 1, -1).colors[1] != self.c.get_piece(1, 1, -1).colors[1] and
+                  self.c.get_piece(1, 1, -1).colors[0] != self.c.get_piece(1, -1, -1).colors[0] and
+                  self.c.get_piece(1, -1, -1).colors[1] != self.c.get_piece(-1, -1, -1).colors[1] and
+                  self.c.get_piece(-1, 1, -1).colors[0] != self.c.get_piece(-1, -1, -1).colors[0]):
+                self.c.sequence("U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui")
+                final_corner_algorithm += " U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui"
             else:
-                print("No Cases Found..")
-                return None
-        print("Final Corners Solved")
-        print("Final Corners Algorithm = " + final_corner_algorithm)
-        return final_corner_algorithm
+                if self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1]:
+                    self.c.sequence("B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
+                    final_corner_algorithm += " B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+                elif self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0]:
+                    self.c.sequence("B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
+                    final_corner_algorithm += " B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+                elif self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1]:
+                    self.c.sequence("Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
+                    final_corner_algorithm += " Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+                elif self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]:
+                    self.c.sequence("R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
+                    final_corner_algorithm += " R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
+                else:
+                    print("No Cases Found..")
+                    return None
+            print("Final Corners Solved")
+            print("Final Corners Algorithm = " + final_corner_algorithm)
+            return final_corner_algorithm
 
     def solveFinalEdge(self):
         print(self.c)
@@ -1003,7 +1027,6 @@ class SolveCube:
         # First Check is to check if any entire side matches (corner, edge, corner)
         else:
             # check all values on yellow face == yellow
-
             if (self.c.get_piece(1, 1, -1).colors[2] == "Y" and
                     self.c.get_piece(0, 1, -1).colors[2] == "Y" and
                     self.c.get_piece(-1, 1, -1).colors[2] == "Y" and
@@ -1105,44 +1128,65 @@ class SolveCube:
             else:
                 return None
 
-
-
     def solveCube(self):
         if self.c.is_solved():
             print("Cube Already Solved")
         else:
             print("----------------------------------------------------------------------------------")
             stage_1 = self.solveWhiteCross()
+            if stage_1 == None:
+                print("Error Solving White Cross")
+                return None
+            print(self.c)
             print("----------------------------------------------------------------------------------")
             stage_2 = self.solveWhiteCorner()
+            if stage_2 == None:
+                print("Error White Corner")
+                return None
+            print(self.c)
             print("----------------------------------------------------------------------------------")
             stage_3 = self.solveSecondLayer()
+            if stage_3 == None:
+                print("Error Solving F2L")
+                return None
+            print(self.c)
             print("----------------------------------------------------------------------------------")
             stage_4 = self.solveYellowCross()
+            if stage_4 == None:
+                print("Error Solving Yellow Cross")
+                return None
+            print(self.c)
             print("----------------------------------------------------------------------------------")
+            print("OLL")
             stage_5 = self.orientLastLayer()
             if stage_5 == None:
-                print("Error in OLL")
+                print("Error Solving OLL")
                 return None
-            else:
-                print("----------------------------------------------------------------------------------")
-                stage_6 = self.solveFinalCorners()
-                if stage_6 == None:
-                    print("Error in Final Corner")
-                    return None
-                else:
-                    print("----------------------------------------------------------------------------------")
-                    stage_7 = self.solveFinalEdge()
-                    if stage_7 == None:
-                        print("Error in Final Edge")
-                        return None
-                    else:
-                        print("----------------------------------------------------------------------------------")
-                        print(self.c)
-                        return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
+            print(self.c)
 
-#WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB
+            print("----------------------------------------------------------------------------------")
+            stage_6 = self.solveFinalCorners()
+            print(self.c)
+            if stage_6 == None:
+                print("Error Solving Final Corner")
+                return None
+            print("----------------------------------------------------------------------------------")
+            stage_7 = self.solveFinalEdge()
+            if stage_7 == None:
+                print("Error Solving Final Edge")
+                return None
+            print("----------------------------------------------------------------------------------")
+            print(self.c)
 
-cube = Cube("WOWOOBBWWRGRYBBORRBYGRGBYWRGBOBYWOWGRGOWYOYYYYWGORGGRB")
+
+            return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
+
+
+cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+cube.sequence("Fi  L  Fi  R  Fi  R  U  Ui  Fi  Ri  B  F  Bi   Di  L  B  L  Bi  Ui")
 S = SolveCube(cube)
-S.solveCube()
+S.solveWhiteCross()
+print(S.c)
+
+# Re order list - -so that it comes in specific order...
+

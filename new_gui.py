@@ -4,7 +4,7 @@ from tkinter import messagebox
 from CubeScanner import CubeScanner
 from Solver import SolveCube
 import numpy as np
-
+from fpdf import FPDF
 
 root = Tk()  # Draws the window
 edit_mode = False
@@ -260,7 +260,7 @@ cubeCanvas.tag_bind("green_02", "<Button-1>", editColor)
 green_10 = cubeCanvas.create_rectangle(20, 320, 90, 390, width=0, fill='green', tag="green_10")
 cubeCanvas.tag_bind("green_10", "<Button-1>", editColor)
 green_11 = cubeCanvas.create_rectangle(100, 320, 170, 390, width=0, fill='green', tag="green_11")
-cubeCanvas.tag_bind("green_11", "<Button-1>", editColor)
+# Green_11 cannot be edited
 green_12 = cubeCanvas.create_rectangle(180, 320, 250, 390, width=0, fill='green', tag="green_12")
 cubeCanvas.tag_bind("green_12", "<Button-1>", editColor)
 # Green Face (Layer 3)
@@ -283,7 +283,7 @@ cubeCanvas.tag_bind("white_02", "<Button-1>", editColor)
 white_10 = cubeCanvas.create_rectangle(260, 320, 330, 390, width=0, fill='White', tag="white_10")
 cubeCanvas.tag_bind("white_10", "<Button-1>", editColor)
 white_11 = cubeCanvas.create_rectangle(340, 320, 410, 390, width=0, fill='White', tag="white_11")
-cubeCanvas.tag_bind("white_11", "<Button-1>", editColor)
+# White_11 cannot be edited
 white_12 = cubeCanvas.create_rectangle(420, 320, 490, 390, width=0, fill='White', tag="white_12")
 cubeCanvas.tag_bind("white_12", "<Button-1>", editColor)
 
@@ -307,7 +307,7 @@ cubeCanvas.tag_bind("orange_02", "<Button-1>", editColor)
 orange_10 = cubeCanvas.create_rectangle(260, 80, 330, 150, width=0, fill='orange', tag="orange_10")
 cubeCanvas.tag_bind("orange_10", "<Button-1>", editColor)
 orange_11 = cubeCanvas.create_rectangle(340, 80, 410, 150, width=0, fill='orange', tag="orange_11")
-cubeCanvas.tag_bind("orange_11", "<Button-1>", editColor)
+
 orange_12 = cubeCanvas.create_rectangle(420, 80, 490, 150, width=0, fill='orange', tag="orange_12")
 cubeCanvas.tag_bind("orange_12", "<Button-1>", editColor)
 
@@ -331,7 +331,7 @@ cubeCanvas.tag_bind("blue_02", "<Button-1>", editColor)
 blue_10 = cubeCanvas.create_rectangle(500, 320, 570, 390, width=0, fill='blue', tag="blue_10")
 cubeCanvas.tag_bind("blue_10", "<Button-1>", editColor)
 blue_11 = cubeCanvas.create_rectangle(580, 320, 650, 390, width=0, fill='blue', tag="blue_11")
-cubeCanvas.tag_bind("blue_11", "<Button-1>", editColor)
+
 blue_12 = cubeCanvas.create_rectangle(660, 320, 730, 390, width=0, fill='blue', tag="blue_21")
 cubeCanvas.tag_bind("blue_12", "<Button-1>", editColor)
 
@@ -355,7 +355,7 @@ cubeCanvas.tag_bind("yellow_02", "<Button-1>", editColor)
 yellow_10 = cubeCanvas.create_rectangle(740, 320, 810, 390, width=0, fill='Yellow', tag="yellow_10")
 cubeCanvas.tag_bind("yellow_10", "<Button-1>", editColor)
 yellow_11 = cubeCanvas.create_rectangle(820, 320, 890, 390, width=0, fill='Yellow', tag="yellow_11")
-cubeCanvas.tag_bind("yellow_11", "<Button-1>", editColor)
+
 yellow_12 = cubeCanvas.create_rectangle(900, 320, 970, 390, width=0, fill='Yellow', tag="yellow_21")
 cubeCanvas.tag_bind("yellow_12", "<Button-1>", editColor)
 
@@ -379,7 +379,7 @@ cubeCanvas.tag_bind("red_02", "<Button-1>", editColor)
 red_10 = cubeCanvas.create_rectangle(260, 560, 330, 630, width=0, fill='red', tag="red_10")
 cubeCanvas.tag_bind("red_10", "<Button-1>", editColor)
 red_11 = cubeCanvas.create_rectangle(340, 560, 410, 630, width=0, fill='red', tag="red_11")
-cubeCanvas.tag_bind("red_11", "<Button-1>", editColor)
+
 red_12 = cubeCanvas.create_rectangle(420, 560, 490, 630, width=0, fill='red', tag="red_12")
 cubeCanvas.tag_bind("red_12", "<Button-1>", editColor)
 
@@ -391,9 +391,6 @@ cubeCanvas.tag_bind("red_21", "<Button-1>", editColor)
 red_22 = cubeCanvas.create_rectangle(420, 640, 490, 710, width=0, fill='red', tag="red_21")
 cubeCanvas.tag_bind("red_22", "<Button-1>", editColor)
 
-
-def test():
-    performAlgorithm("Ui Ri B B B B")
 
 def solveCube():
     global current_cube
@@ -409,11 +406,16 @@ def solveCube():
             if checkSolvable(flattenCube()):
                 solver = SolveCube(new_cube)
                 algo = solver.solveCube()
+                print(algo)
+                print(flattenCube())
                 if algo == None:
-                    messagebox.showinfo("Cube Unsolvable", "Double Check Values...")
-                else: performAlgorithm(algo)
+                    messagebox.showerror(title="Cube Unsolvable", message="This cube cannot be solved, - this is due to an piece incorrectly rotated , "
+                                                                         "please double check your cube / the digital on-screen cube")
+                else:
+                    performAlgorithm(algo)
+                    solve_text.set(algo)
             else:
-                messagebox.showinfo("Cube Unsolvable", "Unequal Number of Colours")
+                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
 
 
 def scanCube():
@@ -462,12 +464,65 @@ def scanCube():
     updateCubeColours()
 
 
+def displaySummary(algo):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Arial', 'B', 20)
+    pdf.cell(40, 10, 'Rubiks Cube Solve Summary:')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.cell(40, 10, 'Cube String: ' + flattenCube())
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'White Cross')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 100,' ' + str(algo[1][0]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'White Corners')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][1]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'Second Layer (Edge Pieces)')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][2]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'OLL (1)')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][3]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'OLL (2)')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][4]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'PLL (1)')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][5]))
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(40, 10, 'PLL (2)')
+    pdf.ln(h='')
+    pdf.set_font('Arial', 'I', 10)
+    pdf.multi_cell(40, 10, ' ' + str(algo[1][6]))
+
+
+    pdf.output('tuto1.pdf', 'F')
+
+
 
 solveButton = Button(root, text="Solve Cube", command=lambda: solveCube())
-solveButton.config(font=("Arial", 20))
-solveButton.place(x=1150, y=700)
-
-
+solveButton.config(font=("Arial", 15))
+solveButton.place(x=1165, y=700)
 
 # Label For Main Title
 title = Label(root, text="Rubiks Cube Solver")
@@ -540,11 +595,18 @@ cubeCanvas.tag_bind("edit_green", "<Button-1>", editColor)
 cubeCanvas.tag_bind("edit_yellow", "<Button-1>", editColor)
 
 
-debugButton = Button(root, text="Print Cube", command=lambda: printDetails())
-debugButton.config(font=("Arial", 15))
-debugButton.place(x=1230, y=600)
 
-checkSolvable(flattenCube())
+# Solve Text
+solve_text = StringVar()
+solve_text.set("Your Solving Algorithm Will Appear Here")
+scramble_label = Label(root, wraplength=200, textvariable=solve_text)
+scramble_label.place(x=1130, y=420)
+
+# Solve Text
+solve_text = StringVar()
+solve_text.set("")
+scramble_label = Label(root, wraplength=200, textvariable=solve_text)
+scramble_label.place(x=1115, y=460)
 
 # print(flattenCube())
 root.resizable(False, False)

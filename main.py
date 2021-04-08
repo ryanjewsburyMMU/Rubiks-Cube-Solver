@@ -18,7 +18,7 @@ import new_gui
 # # https://st
 # ackoverflow.com/questions/52083797/opencv-detecting-color-ranges-and-display-on-console
 #
-# # https://stackoverflow.com/questions/60051941/find-the-coordinates-in-an-image-where-a-specified-colour-is-detected
+# # https://stackoverflow.com/questions/60051941/find-the-coordinates-in-an-image-where-a-specified-colour-is-detected*
 #
 # # Collect data of colours
 #

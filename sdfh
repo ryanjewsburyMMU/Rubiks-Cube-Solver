@@ -16,4 +16,49 @@ TODO:
 - Comment All Code
 - Do ALOT of testing
 - Try and give incorrect cubes  - test stability of error detection
-- Possibly Add simple timer - if time superpasses 15 seconds, alert user and error has occured. 
+- Possibly Add simple timer - if time superpasses 15 seconds, alert user and error has occured.
+- Make becca able to understand messagebox, then anyone will
+- Remove X Y and M from scrambles
+- Implement x2 values ("R2, L2")
+
+-- Scramble Optimiser?
+
+
+
+R Ui F L B D
+
+SOMETHING HAPPENED WRONG
+
+double look over white cross
+algorithm not working as expected...
+
+
+# Notes
+----------------------------------
+OpenCV window did not close
+with the addition of
+--
+cv2.destroyAllWindows()
+for i in range(1, 5):
+    cv2.waitKey(1)
+--
+It closes fine.
+
+# After Yellow Cross (GUI)
+    BRB
+    OOO
+    OOO
+OGG WWW BBR YYY
+OGG WWW BBB YYY
+GGG WWW BBG YYY
+    RRR
+    RRR
+    RGO
+
+
+
+  WHITE / BLUE
+  WHITE / GREEN
+  WHITE / ORANGE
+  WHITE / RED
+
