@@ -1178,15 +1178,6 @@ class SolveCube:
             print("----------------------------------------------------------------------------------")
             print(self.c)
 
-
-            return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7
-
-
-cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-cube.sequence("Fi  L  Fi  R  Fi  R  U  Ui  Fi  Ri  B  F  Bi   Di  L  B  L  Bi  Ui")
-S = SolveCube(cube)
-S.solveWhiteCross()
-print(S.c)
-
-# Re order list - -so that it comes in specific order...
+            solve_list = [stage_1 , stage_2 , stage_3 , stage_4 , stage_5 , stage_6 , stage_7]
+            return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 

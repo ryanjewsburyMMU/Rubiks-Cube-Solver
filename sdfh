@@ -62,3 +62,11 @@ GGG WWW BBG YYY
   WHITE / ORANGE
   WHITE / RED
 
+
+  # Order:
+   move_title
+   edit_cube_title
+   resetButton
+
+
+   randomScrambleButton
