@@ -2,6 +2,7 @@ import random
 from rubik.cube import Cube
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 from CubeScanner import CubeScanner
 from Solver import SolveCube
 import numpy as np
