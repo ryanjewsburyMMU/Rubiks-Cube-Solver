@@ -1,4 +1,6 @@
 import random
+import time
+
 from rubik.cube import Cube
 from tkinter import *
 from tkinter import messagebox
@@ -7,6 +9,8 @@ from CubeScanner import CubeScanner
 from Solver import SolveCube
 import numpy as np
 from fpdf import FPDF
+from tkmacosx import Button as btn
+
 
 
 root = Tk()
@@ -232,6 +236,9 @@ def updateCube(newCubeString):
     updateCubeColours()
     cubeCanvas.update_idletasks()
 
+def resetCube():
+    updateCube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+    solve_listbox.delete(0,'end')
 
 def printDetails():
     print(flattenCube())
@@ -247,7 +254,7 @@ def performAlgorithm(algo):
                 print("Move = " + move)
                 print(current_cube)
                 current_cube.sequence(move)
-                cubeCanvas.after(200, updateCubeColours())
+                cubeCanvas.after(10, updateCubeColours())
                 cubeCanvas.update_idletasks()
             except:
                 print("Cannot Perform Move '" + move + "'")
@@ -288,14 +295,37 @@ def solveCube():
                 solver = SolveCube(new_cube)
                 algo = solver.solveCube()
                 if algo == None:
-                    messagebox.showerror(title="Cube Unsolvable", message="This cube cannot be solved, - this is due to an piece incorrectly rotated ,please double check your cube / the digital on-screen cube")
+                    messagebox.showerror(title="Cube Unsolvable", message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
                 else:
+                    solve_listbox.delete(0, 'end')
                     performAlgorithm(algo[0])
-                    solve_text.set(algo[0])
                     displaySummary(algo, cube_str)
-                    print(algo[0])
-                    # R Ui F L B D Ri Li B Ui
-                    #  F D Fi F U Fi F R Fi D Fi R F Ri Bi R B D B Di Bi D B Di Bi D B Di Bi B B B Li Bi L B Li Bi L B Li Bi L B B B L B Li Bi B B R B Ri Bi R B Ri Bi R B Ri Bi  D B Di Bi Ri Bi R B B B D B Di Bi Ri Bi R B B B Li Bi L B U B Ui B B Di Bi D B L B Li Bi B B R B Ri Bi Ui Bi U B B D B L Bi Li Di  B B B B R R F Ri B B R Fi Ri B B Ri B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui  B Mi Mi Bi M Bi Bi Mi Bi Mi Mi B
+                    move_num = 0
+                    for i in algo[0].split():
+                        move_num+= 1
+                        solve_listbox.insert(END, "Move " + str(move_num) + ": " + i)
+            else:
+                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
+
+def stepByStepSolve():
+    global current_cube
+    if edit_mode:
+        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
+    else:
+        new_cube = Cube(flattenCube())
+        cube_str = flattenCube()
+        if new_cube.is_solved():
+            messagebox.showinfo("Cube Solved", "This cube is already solved!")
+        else:
+            if checkSolvable(flattenCube()):
+                solver = SolveCube(new_cube)
+                algo = solver.solveCube()
+                if algo == None:
+                    messagebox.showerror(title="Cube Unsolvable",
+                                         message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
+                else:
+                    solve_listbox.delete(0, 'end')
+                    sbsSolve(algo[0])
             else:
                 messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
 
@@ -425,6 +455,66 @@ def generateScramble():
     return 0
 
 
+
+def sbsSolve(algo):
+    print("Displaying Solve (Step By step)")
+    stepSolve = Toplevel(root)
+    # sets the title of the
+    # Toplevel widget
+    stepSolve.title("Solving Move.")
+    # sets the geometry of toplevel
+    stepSolve.geometry("400x140")
+
+    # Convert Algorithm to list
+    algo_list = []
+    algo_num = 0
+    algo_num_list = []
+    for i in algo.split():
+        algo_list.append(i)
+        algo_num += 1
+        algo_num_list.append(algo_num)
+
+    # Convert List to Iterable
+    num_iter = iter(algo_num_list)
+    algo_iter = iter(algo_list)
+
+    title_label = Label(stepSolve, text="Step by Step Solve")
+    title_label.config(font=("Arial", 20))
+    title_label.place(x=45,y=10)
+
+    move = StringVar()
+    move.set("Move: ")
+    move_label = Label(stepSolve, wraplength=200, textvariable=move)
+    move_label.place(x=50, y=50)
+
+    clear_move = StringVar()
+    clear_move.set("Word:")
+    clear_move_label = Label(stepSolve, wraplength=200, textvariable=clear_move)
+    clear_move_label.place(x=50, y=80)
+
+    num_move = StringVar()
+    num_move.set("Num: ")
+    num_move_label = Label(stepSolve, wraplength=200, textvariable=num_move)
+    num_move_label.place(x=50, y=110)
+
+    nextMoveButton = Button(stepSolve, text="Next Move", command=lambda: nextMove(algo_iter, num_iter))
+    nextMoveButton.place(x=290, y=100)
+
+    # Function Hierachy
+    def nextMove(algo_iter, num_iter):
+        try:
+            next_move = next(algo_iter)
+            move_number = next(num_iter)
+            solve_listbox.insert(END, "Move " + str(move_number) + ": " + next_move)
+
+            move.set("Move: " + str(next_move))
+            clear_move.set("Word: " + notationToMove(str(next_move)))
+            num_move.set("Num: " + str(move_number) + " / " + str(len(algo_list)))
+            performAlgorithm(str(next_move))
+        except:
+            move.set("Move: There are no more moves.")
+            clear_move.set("Word: There are no more moves.")
+
 def openSettings():
     global settings_open
     from PIL import ImageTk, Image
@@ -449,21 +539,17 @@ def openSettings():
     image_label.photo = cube_image
     image_label.place(x=148,y=0)
     #
-    # # # Settings Label (Title)
-    # settings_label = Label(settings_canvas, text=" Settings:")
-    # settings_label.config(font=("Arial", 20))
-    # settings_label.place(x=180,y=10)
 
     # Mode Label
     mode_label = Label(settings_canvas, text=" Mode")
     mode_label.config(font=("Arial", 20))
     mode_label.place(x=165, y=105)
 
-    mode_dark = Button(settings_canvas, text="Dark Mode", command= lambda: theme_dark())
+    mode_dark = btn(settings_canvas, text="Dark Mode", command= lambda: theme_dark(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     mode_dark.config(font=("Arial", 15))
     mode_dark.place(x=95, y=140)
 
-    mode_light = Button(settings_canvas, text="Light Mode", command= lambda: print("Light Mode"))
+    mode_light = btn(settings_canvas, text="Light Mode", command= lambda: theme_light(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     mode_light.config(font=("Arial", 15))
     mode_light.place(x=200, y=140)
 
@@ -472,11 +558,11 @@ def openSettings():
     sound_label.config(font=("Arial", 20))
     sound_label.place(x=160, y=185)
 
-    mute_button = Button(settings_canvas, text="Mute Sound", command= lambda: print("Mute Mode"))
+    mute_button = btn(settings_canvas, text="Mute Sound", command= lambda: print("Mute Mode"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     mute_button.config(font=("Arial", 15))
     mute_button.place(x=85, y=220)
 
-    unmute_button = Button(settings_canvas, text="Unmute Sound", command= lambda: print("Unmute Mode"))
+    unmute_button = btn(settings_canvas, text="Unmute Sound", command= lambda: print("Unmute Mode"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     unmute_button.config(font=("Arial", 15))
     unmute_button.place(x=200, y=220)
 
@@ -485,38 +571,51 @@ def openSettings():
     close_label.config(font=("Arial", 20))
     close_label.place(x=130, y=270)
 
-    close_app_button = Button(settings_canvas, text="Close App", command=lambda: print("Closing App"))
+    close_app_button = btn(settings_canvas, text="Close App", command=lambda: print("Closing App"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     close_app_button.config(font=("Arial", 15))
     close_app_button.place(x=153, y=305)
 
-    github_button = Button(settings_canvas, text="Git-Hub", command=lambda: print("Opening GitHub"))
+    github_button = btn(settings_canvas, text="Git-Hub", command=lambda: print("Opening GitHub"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     github_button.config(font=("Arial", 15))
     github_button.place(x=120, y=340)
 
-    reset_app_button = Button(settings_canvas, text="Restart", command=lambda: print("Reseting App"))
+    reset_app_button = btn(settings_canvas, text="Restart", command=lambda: print("Reseting App"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     reset_app_button.config(font=("Arial", 15))
     reset_app_button.place(x=200, y=340)
 
     def theme_dark():
+
+        # Colours
+        main_bg = "#232323"
+        listbox_bg = "#2E2E2E"
+        button_bg = "#BB86FC"
+        button_fg = "#fff"
+        button_outer = "#2E2E2E"
+        text_bg = "#232323"
+        text_fg = "#fff"
+
         # Background
         root.configure(background='#232323')
+        solve_listbox.config(bg="#2E2E2E", fg="#fff")
         # Text & Labels
-        title.config(bg="#232323", fg="#fff")
-        subTitle.config(bg="#232323", fg="#fff")
-        scan_title.config(bg="#232323", fg="#fff")
-        edit_mode_label.config(bg="#232323", fg="#fff")
-        scramble_label.config(bg="#232323", fg="#fff")
-        move_title.config(bg="#232323", fg="#fff")
-        edit_cube_title.config(bg="#232323", fg="#fff")
+        title.config(bg=text_bg, fg=text_fg)
+        subTitle.config(bg=text_bg, fg=text_fg)
+        scan_title.config(bg=text_bg, fg=text_fg)
+        edit_mode_label.config(bg=text_bg, fg=text_fg)
+        scramble_label.config(bg=text_bg, fg=text_fg)
+        move_title.config(bg=text_bg, fg=text_fg)
+        edit_cube_title.config(bg=text_bg, fg=text_fg)
         # Buttons & Input
-        settingsButton.config(highlightbackground="#232323")
-        moreInfo.config(highlightbackground="#232323")
-        scanCube_button.config(highlightbackground="#232323")
-        edit_cube_button.config(highlightbackground="#232323")
-        moveInputButton.config(highlightbackground="#232323")
-        solveButton.config(highlightbackground="#232323")
-        resetButton.config(highlightbackground="#232323")
-        randomScrambleButton.config(highlightbackground="#232323")
+        settingsButton.config(bg=button_bg,fg=button_fg, highlightbackground=button_outer)
+        moreInfo.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        scanCube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        edit_cube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        moveInputButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        solveButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        resetButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        randomScrambleButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        sbsButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        moveInput.config(highlightbackground=main_bg, fg=button_fg, bg=listbox_bg)
 
         # Settings Screen
         # Background
@@ -529,18 +628,75 @@ def openSettings():
         sound_label.config(bg="#232323", fg="#fff")
         close_label.config(bg="#232323", fg="#fff")
         # Buttons
-        mode_dark.config(highlightbackground="#232323")
-        mode_light.config(highlightbackground="#232323")
-        mute_button.config(highlightbackground="#232323")
-        unmute_button.config(highlightbackground="#232323")
-        close_app_button.config(highlightbackground="#232323")
-        github_button.config(highlightbackground="#232323")
-        reset_app_button.config(highlightbackground="#232323")
+        mode_dark.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        mode_light.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        mute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        unmute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        close_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        github_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        reset_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
 
+    def theme_light():
 
+        # Colours
+        main_bg = "#fff"
+        listbox_bg = "#2E2E2E"
+        button_bg = "#BB86FC"
+        button_fg = "#fff"
+        button_outer = "#2E2E2E"
+        text_bg = "#232323"
+        text_fg = "#fff"
+        white_color = '#fff'
+
+        # Background
+        root.configure(background=main_bg)
+        solve_listbox.config(bg=listbox_bg, fg=white_color)
+        # Text & Labels
+        title.config(bg=text_bg, fg=text_fg)
+        subTitle.config(bg=text_bg, fg=text_fg)
+        scan_title.config(bg=text_bg, fg=text_fg)
+        edit_mode_label.config(bg=text_bg, fg=text_fg)
+        scramble_label.config(bg=text_bg, fg=text_fg)
+        move_title.config(bg=text_bg, fg=text_fg)
+        edit_cube_title.config(bg=text_bg, fg=text_fg)
+        # Buttons & Input
+        settingsButton.config(bg=button_bg,fg=button_fg, highlightbackground=button_outer)
+        moreInfo.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        scanCube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        edit_cube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        moveInputButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        solveButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        resetButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        randomScrambleButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        sbsButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        moveInput.config(highlightbackground=main_bg, fg=button_fg, bg=listbox_bg)
+
+        # Settings Screen
+        # Background
+        newWindow.configure(background=main_bg)
+        settings_canvas.config(bg=main_bg, bd=0, highlightthickness=0, borderwidth=0,highlightbackground=main_bg)
+        # Images
+        image_label.config(bg=main_bg)
+        # Text & Labels
+        mode_label.config(bg=text_bg, fg=text_fg)
+        sound_label.config(bg=text_bg, fg=text_fg)
+        close_label.config(bg=text_bg, fg=text_fg)
+        # Buttons
+        mode_dark.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        mode_light.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        mute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        unmute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        close_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        github_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        reset_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
 
 
     newWindow.grab_set()
+
+# Global variables for current move...
+
+
+
 
 
 
@@ -686,6 +842,7 @@ cubeCanvas.tag_bind("red_21", "<Button-1>", editColor)
 red_22 = cubeCanvas.create_rectangle(420, 640, 490, 710, width=0, fill='red', tag="red_21")
 cubeCanvas.tag_bind("red_22", "<Button-1>", editColor)
 
+
 # Label For Main Title
 title = Label(root, text="Rubiks Cube Solver")
 title.config(font=("Courier", 30))
@@ -697,12 +854,12 @@ subTitle.config(font=("Arial", 20))
 subTitle.place(x=1090, y=60)
 
 # More Information Button
-moreInfo = Button(root, text="More Info", command=lambda: print("more info pressed"))
+moreInfo = btn(root, text="More Info", command=lambda: print("More info"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 moreInfo.config(font=("Arial", 15))
 moreInfo.place(x=1100, y=100)
 
 # Settings Button
-settingsButton = Button(root, text="Settings", command=lambda: openSettings())
+settingsButton = btn(root, text="Settings", command=lambda: openSettings(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 settingsButton.config(font=("Arial", 15))
 settingsButton.place(x=1230, y=100)
 
@@ -712,7 +869,7 @@ scan_title.config(font=("Arial", 20))
 scan_title.place(x=1110, y=150)
 
 # Scan Cube Button
-scanCube_button = Button(root, text="Scan Cube", command=lambda: scanCube())
+scanCube_button = btn(root, text="Scan Cube", command=lambda: scanCube(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 scanCube_button.config(font=("Arial", 15))
 scanCube_button.place(x=1160, y=180)
 
@@ -725,7 +882,7 @@ edit_mode_label.config(font=("Arial", 20), fg="white", bg="black")
 edit_cube_title = Label(root, text="Edit This Cube")
 edit_cube_title.config(font=("Arial", 20))
 edit_cube_title.place(x=1142, y=350)
-edit_cube_button = Button(root, text="Enter Edit Mode", command=lambda: editMode(edit_mode_label, edit_cube_button))
+edit_cube_button = btn(root, text="Enter Edit Mode", command=lambda: editMode(edit_mode_label, edit_cube_button),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 edit_cube_button.place(x=1150, y=380)
 
 # Perform Move
@@ -736,9 +893,9 @@ move_title.place(x=1110, y=230)
 # Move Input
 moveInput = Entry(root)
 moveInput.place(x=1125, y=260)
-moveInputButton = Button(root, text="Make Move", command=lambda: performAlgorithm(moveInput.get()))
+moveInputButton = btn(root, text="Make Move", command=lambda: performAlgorithm(moveInput.get()),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 moveInputButton.place(x=1160, y=290)
-randomScrambleButton = Button(root, text="Random Scramble", command=lambda: generateScramble())
+randomScrambleButton = btn(root, text="Random Scramble", command=lambda: generateScramble(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 randomScrambleButton.place(x=1141, y=315)
 
 
@@ -758,8 +915,6 @@ cubeCanvas.tag_bind("edit_orange", "<Button-1>", editColor)
 cubeCanvas.tag_bind("edit_green", "<Button-1>", editColor)
 cubeCanvas.tag_bind("edit_yellow", "<Button-1>", editColor)
 
-
-
 # Solve Text
 solve_text = StringVar()
 solve_text.set("Your Solving Algorithm Will Appear Here")
@@ -767,14 +922,25 @@ scramble_label = Label(root, wraplength=200, textvariable=solve_text)
 scramble_label.place(x=1130, y=420)
 
 
+solve_listbox = Listbox(root)
+solve_listbox.place(x=1137,y=480)
 
-solveButton = Button(root, text="Solve Cube", command=lambda: solveCube())
+
+
+
+sbsButton = btn(root, text="Step By Step Solve", command=lambda: stepByStepSolve(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+sbsButton.config(font=("Arial", 15))
+sbsButton.place(x=1140, y=670)
+
+
+solveButton = btn(root, text="Solve Cube", command=lambda: solveCube(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 solveButton.config(font=("Arial", 15))
 solveButton.place(x=1110, y=700)
 
-resetButton = Button(root, text="Reset Cube", command=lambda: updateCube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR"))
+resetButton = btn(root, text="Reset Cube", command=lambda: resetCube(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 resetButton.config(font=("Arial", 15))
 resetButton.place(x=1220, y=700)
+
 
 root.resizable(False, False)
 root.mainloop()
