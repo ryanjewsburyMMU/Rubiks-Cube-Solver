@@ -10,14 +10,24 @@ from Solver import SolveCube
 import numpy as np
 from fpdf import FPDF
 from tkmacosx import Button as btn
+import pygame
+
+pygame.mixer.init()  # initialise the pygame
+
+def play():
+    file_num = random.randrange(1,12)
+    file = ("SoundEffects/Cube Moves/move_"+ str(file_num)+".mp3")
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play(loops=0)
 
 
-
+# Global Variables
 root = Tk()
 edit_mode = False
 current_color = " "
 dark_mode_active = False
 settings_open = False
+mute_active = False
 
 # These next lines define size, position and title of tkinter window
 root.geometry('1400x740+10+10')  # width x height + xpos + ypos
@@ -251,10 +261,15 @@ def performAlgorithm(algo):
     else:
         for move in algo.split():
             try:
+                # Plays Sound If Not muted
+                if mute_active == False:
+                    play()
+                else:
+                    pass
                 print("Move = " + move)
                 print(current_cube)
                 current_cube.sequence(move)
-                cubeCanvas.after(10, updateCubeColours())
+                cubeCanvas.after(150, updateCubeColours())
                 cubeCanvas.update_idletasks()
             except:
                 print("Cannot Perform Move '" + move + "'")
@@ -452,10 +467,13 @@ def displaySummary(algo, cube_str):
 def generateScramble():
     notation = [" R ", " U ", " F ", " L ", " B ", "  D ", " Ri ", " Ui ", " Fi ", " Li ", " Bi ", "  Di "]
     scramble = " "
+    solve_listbox.delete(0, 'end')
     for i in range(1, 20):
-        scramble += str(notation[random.randrange(0, 12)])
+        current_move = str(notation[random.randrange(0, 12)])
+        scramble += current_move
+        solve_listbox.insert(END, "Move " + str(i) + ": " + current_move)
     performAlgorithm(scramble)
-    return 0
+
 
 
 
@@ -518,10 +536,19 @@ def sbsSolve(algo):
             move.set("Move: There are no more moves.")
             clear_move.set("Word: There are no more moves.")
 
+def mute():
+    global mute_active
+    mute_active = True
+
+def unmute():
+    global mute_active
+    mute_active = False
+
 
 # Open Settings
 def openSettings():
     global settings_open
+
     # Toplevel object which will
     # be treated as a new window
     newWindow = Toplevel(root)
@@ -557,15 +584,15 @@ def openSettings():
     mode_light.place(x=200, y=140)
 
     # Sound Label
-    sound_label = Label(settings_canvas, text=" Sound")
+    sound_label = Label(settings_canvas, text=" Sound: ")
     sound_label.config(font=("Arial", 20))
     sound_label.place(x=160, y=185)
 
-    mute_button = btn(settings_canvas, text="Mute Sound", command= lambda: print("Mute Mode"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+    mute_button = btn(settings_canvas, text="Mute Sound", command= lambda: mute(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     mute_button.config(font=("Arial", 15))
     mute_button.place(x=85, y=220)
 
-    unmute_button = btn(settings_canvas, text="Unmute Sound", command= lambda: print("Unmute Mode"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+    unmute_button = btn(settings_canvas, text="Unmute Sound", command= lambda: unmute(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     unmute_button.config(font=("Arial", 15))
     unmute_button.place(x=200, y=220)
 
@@ -574,17 +601,13 @@ def openSettings():
     close_label.config(font=("Arial", 20))
     close_label.place(x=130, y=270)
 
-    close_app_button = btn(settings_canvas, text="Close App", command=lambda: print("Closing App"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+    close_app_button = btn(settings_canvas, text="Close App", command=lambda: root.destroy(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     close_app_button.config(font=("Arial", 15))
     close_app_button.place(x=153, y=305)
 
     github_button = btn(settings_canvas, text="Git-Hub", command=lambda: print("Opening GitHub"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
     github_button.config(font=("Arial", 15))
-    github_button.place(x=120, y=340)
-
-    reset_app_button = btn(settings_canvas, text="Restart", command=lambda: print("Reseting App"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
-    reset_app_button.config(font=("Arial", 15))
-    reset_app_button.place(x=200, y=340)
+    github_button.place(x=160, y=340)
 
     def theme_dark():
         # Colours
@@ -609,7 +632,7 @@ def openSettings():
         edit_cube_title.config(bg=text_bg, fg=text_fg)
         # Buttons & Input
         settingsButton.config(bg=button_bg,fg=button_fg, highlightbackground=button_outer)
-        moreInfo.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        quickStartButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         scanCube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         edit_cube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         moveInputButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
@@ -636,19 +659,17 @@ def openSettings():
         unmute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         close_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         github_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
-        reset_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
 
     def theme_light():
-
         # Colours
-        main_bg = "#fff"
-        listbox_bg = "#2E2E2E"
-        button_bg = "#BB86FC"
-        button_fg = "#fff"
-        button_outer = "#2E2E2E"
-        text_bg = "#232323"
-        text_fg = "#fff"
-        white_color = '#fff'
+        main_bg = "#ffffff"
+        listbox_bg = "#ffffff"
+        button_bg = "#EEEEEE"
+        button_fg = "#000"
+        button_outer = "white"
+        text_bg = "#ffffff"
+        text_fg = "#000"
+        white_color = '#ffffff'
 
         # Background
         root.configure(background=main_bg)
@@ -662,8 +683,11 @@ def openSettings():
         move_title.config(bg=text_bg, fg=text_fg)
         edit_cube_title.config(bg=text_bg, fg=text_fg)
         # Buttons & Input
+
+     # bg="#EEEEEE", fg="#000", highlightbackground="white")
+
         settingsButton.config(bg=button_bg,fg=button_fg, highlightbackground=button_outer)
-        moreInfo.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
+        quickStartButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         scanCube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         edit_cube_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         moveInputButton.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
@@ -690,7 +714,6 @@ def openSettings():
         unmute_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         close_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         github_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
-        reset_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
 
     newWindow.grab_set()
 
@@ -748,7 +771,7 @@ def openQuickStart():
     cube_scanner_title = Label(cube_scanner, text="\n Scanning Your Own Cube \n ").pack()
     scanner_p1 = open("Text/Scan Your Cube/scanningcube.txt")
     scanner_p1_content = scanner_p1.read()
-    scanner_para1 = Label(cube_scanner, text=scanner_p1_content).pack()
+    Label(cube_scanner, text=scanner_p1_content).pack()
 
     cube_scanner_image = PhotoImage(file="Images/Getting Started Images/Cube Scanner/cube_scanner__image.gif")
     scanner_image_label = Label(cube_scanner, image=cube_scanner_image)
@@ -756,11 +779,11 @@ def openQuickStart():
     scanner_image_label.pack()
 
 
-    # Cube Notation
+    # Cube Notation1400
     cube_notation_title = Label(cube_notation, text="\n Cube Notation\n ").pack()
     notation_p1 = open("Text/Cube Notation/cubenotation.txt")
     notation_p1_content = notation_p1.read()
-    notation_para1 = Label(cube_notation, text=notation_p1_content).pack()
+    Label(cube_notation, text=notation_p1_content).pack()
 
     # Images
     cube_notation_images = PhotoImage(file="Images/Getting Started Images/Notation/cube_notation_image.gif")
@@ -771,21 +794,43 @@ def openQuickStart():
     # Para 2
     notation_p2 = open("Text/Cube Notation/cubenotation_para2.txt")
     notation_p2_content = notation_p2.read()
-    notation_para2 = Label(cube_notation, text=notation_p2_content).pack()
+    Label(cube_notation, text=notation_p2_content).pack()
 
 
     # Drawing Your Cube
     drawing_cube_title = Label(drawing_cube, text="\n Drawing Your Cube Digitally\n ").pack()
+    edit_cube_image = PhotoImage(file="Images/Getting Started Images/Edit Cube/draw_cube.gif")
+    edit_cube_image_label = Label(drawing_cube, image=edit_cube_image)
+    edit_cube_image_label.photo = edit_cube_image
+    edit_cube_image_label.pack()
+
+    drawing_cube_p1 = open("Text/Drawing Your Cube/drawingcube.txt")
+    drawing_cube_p1_content = drawing_cube_p1.read()
+    Label(drawing_cube, text=drawing_cube_p1_content).pack()
+
 
     # Solving Your Cube
     solving_options_title = Label(solving_options, text="\n Solving Your Cube\n ").pack()
 
+    solving_cube_p1 = open("Text/Solving/solving.txt")
+    solving_cube_p1_content = solving_cube_p1.read()
+    Label(solving_options, text=solving_cube_p1_content).pack()
 
+    solving_cube_image = PhotoImage(file="Images/Getting Started Images/Solving Cube/step-by-step.gif")
+    solving_cube_image_label = Label(solving_options, image=solving_cube_image)
+    solving_cube_image_label.photo = solving_cube_image
+    solving_cube_image_label.pack()
 
+    solving_cube_p2 = open("Text/Solving/solving_para2.txt")
+    solving_cube_p2_content = solving_cube_p2.read()
+    Label(solving_options, text=solving_cube_p2_content).pack()
 
+    solving_cube_image2 = PhotoImage(file="Images/Getting Started Images/Solving Cube/full_solve.gif")
+    solving_cube_image_label2 = Label(solving_options, image=solving_cube_image2)
+    solving_cube_image_label2.photo = solving_cube_image2
+    solving_cube_image_label2.pack()
 
-
-
+    quickStart.resizable(False, False)
 
 
 green_00 = cubeCanvas.create_rectangle(20, 240, 90, 310, width=0, fill='green', tag="green_00")
@@ -942,7 +987,7 @@ subTitle.config(font=("Arial", 20))
 subTitle.place(x=1090, y=60)
 
 # More Information Button
-quickStartButton = btn(root, text="More Info", command=lambda: openQuickStart(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+quickStartButton = btn(root, text="Quick Start", command=lambda: openQuickStart(),bg="#45b6fe", fg="#000",highlightbackground="white" )
 quickStartButton.config(font=("Arial", 15))
 quickStartButton.place(x=1100, y=100)
 
@@ -1043,21 +1088,16 @@ root.resizable(False, False)
 root.mainloop()
 
 # TODO
-# More info becomes quick start guide - photos etc
-# Finish dark mode - fix bug on switching from dark mode to light mode
-# Implement sounds
+# More info becomes quick start guide - photos etc // DONE
+# OPENCVV MAKE MORE CLEAR // DONE
+# Implement sounds // DONE
+# Close and restart buttons functionality //DONE
+# Finish dark mode - fix bug on switching from dark mode to light mode /// DONE
+
+
 # Link to github
-# Close and restart buttons functionality
 # Ask stephen about mac development.
-# OPENCVV MAKE MORE CLEAR
+# FIX FINAL MOVE IF CUBE IS NOT SOLVED.
 
+# FINALLY COMMENT ALL CODE
 
-# Quick Start:
-# Tabs = [
-# Getting started
-# Scan Cube
-# Notation
-# Making your own move
-# Building Your digital cube
-# Solving
-# ]

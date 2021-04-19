@@ -1,0 +1,18 @@
+Lets say you don't have a webcam, or you completed the cube scanning, only to notice one colour out of place. This
+is where edit mode comes in.
+
+With edit mode, you can draw your physical cube, digitally using the user friendly UI, this can be used after a scan,
+to fix any potential wrongly identified colours, or to build your cube from scratch.
+
+The only warning would be to make sure you hold your cube correctly when you start drawing - ideally as it is shown
+on screen. For example, you want to have the white face, facing you - and the orange face pointing upwards.
+
+How to use?
+
+1). Enter Edit Mode by clicking the appropriately named button.
+
+2). Click on your desired colour, from the bottom right.
+
+3). With this colour selected, click on any of the cubies to change its colour (Note: you cannot change centre pieces)
+
+4). Once complete, leave edit mode before attempting to solve - this will validate your cube.

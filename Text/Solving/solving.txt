@@ -1,0 +1,9 @@
+Moving onto the solving your cube!
+Please Note - in order to solve correctly, hold your cube with orange face pointing up, and the white face, facing you.
+
+The method I have used in this project to solve the cube, is a mixture between beginers method and CFOP (more on this)
+on my projects GitHub and write up.
+There are two ways to solve the cube in this program.
+Step By Step & Full Solve
+
+Step By Step:

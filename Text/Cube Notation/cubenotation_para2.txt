@@ -1,4 +1,6 @@
 An example algorithm using the previous notation would be:
+
 ' R U Li M Fi B Di R Ui'
+
 You can try different moves, to see how they look and work, by using the 'Make Your Own Move' input box in the main
 program!

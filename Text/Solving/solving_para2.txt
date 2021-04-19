@@ -1,0 +1,10 @@
+The step by step solve will provide you with each individual step (based on my solving method) to solving the cube,
+it will also give you the real world equivalent of each cube notation - for example "F" = "Front Face Right".
+
+This is a great way to make a move on your cube, check to see whether it is correct and move onto the next.
+
+The next way of solving is using the Full Solve - this provides the full solve all at once (Solve Cube Button)
+
+When you click this, the entire cube will (digitally) solve. The solving algorithm will then appear in the listbox,
+( image below ), you can then look at each step, only given the notation. This will help improve your solving ability,
+and also your ability to read and understand notation - this is aimed at more advanced users to follow along with.
