@@ -1,6 +1,7 @@
 from rubik.cube import Cube
 from rubik_solver import utils
 import pycuber as pc
+import random
 class SolveCube:
     def __init__(self, cube):
         self.c = cube
@@ -28,10 +29,15 @@ class SolveCube:
 
     def findWhiteCorner(self):
         white_piece = []
+        # Loop through the entire cube
         for piece in self.c.pieces:
+            # Find all corner pieces
             if piece.type == "corner":
+                # Find all corner pieces that have "W" (White) in them - there should only be 4
                 if piece.colors[0] == "W" or piece.colors[1] == "W" or piece.colors[2] == "W":
+                    # Append the corner pieces to a list, as well as their positions
                     white_piece.append([piece.colors, piece.pos])
+        # Return the list.
         return white_piece
 
     def findMiddleLayerPiece(self, cornerPiece):
@@ -80,7 +86,7 @@ class SolveCube:
             if move == "Li":
                 new_algo += (" Li")
         return new_algo
-
+    # Commented
     def solveWhiteCross(self):
         white_pieces = self.findWhiteEdge()
         possible_faces = ["B", "G", "O", "R"]
@@ -565,23 +571,27 @@ class SolveCube:
         print("White Cross Solved")
         print("White Cross Algorithm = ", cross_algorithm)
         return cross_algorithm
+    # Commented
 
     def solveWhiteCorner(self):
-        count = 0
         whiteCorners = self.findWhiteCorner()
         whiteCornersAlgorithm = ""
 
-        correct_positions = [(1, 1, 1), (1, -1, 1), (-1, 1, 1), (-1, -1, 1)]
+        # Declaring the correct arrangements for each piece.
         correct_arrangements = [['B', 'O', 'W'], ['B', 'R', 'W'], ['G', 'O', 'W'], ['G', 'R', 'W']]
-        try:
-            for val in range(len(whiteCorners)):
-                # First Check
-                # Checking if piece is on bottom row, else skip onto next step
 
-                if whiteCorners[val][1] == (1, 1, 1):  # Doing
+        try:
+            # Loop through all white corners
+            for val in range(len(whiteCorners)):
+                # Checking if piece is on bottom row, else skip onto next step
+                # Check if piece is in the correct location
+                if whiteCorners[val][1] == (1, 1, 1):
+                    # Check if piece is in the correct orientation
                     if whiteCorners[val][0] == correct_arrangements[0]:
+                        # If piece is in the correct place and orientation - leave it.
                         print(correct_arrangements[val], " piece In Correct Location")
                     else:
+                        # If it is in a corner, but it is the wrong piece, remove it from the corner.
                         self.c.sequence("R B Ri Bi")
                         whiteCornersAlgorithm += " R B Ri Bi"
                         whiteCorners = self.findWhiteCorner()
@@ -608,18 +618,25 @@ class SolveCube:
                         whiteCorners = self.findWhiteCorner()
 
                 # Second Section
+                # The piece we are looking for, is not in a corner any more - so move above desired location.
+                # If piece being investigated last vector position = -1, it is in the correct position. (Top row)
                 if whiteCorners[val][1][2] == -1:
+                    # Check if piece is the white orange and blue corner
                     if set(whiteCorners[val][0]).issubset(['W', 'O', 'B']):
+                        # While it is not above the desired location
                         while whiteCorners[val][1] != (1, 1, -1):
                             self.c.sequence("B")
                             whiteCornersAlgorithm += " B"
                             whiteCorners = self.findWhiteCorner()
+                            # Move around, one move at a time until it is above the desired location.
                             if whiteCorners[val][1] == (1, 1, -1):
                                 whiteCorners = self.findWhiteCorner()
+                        # When in the correct location, perform algorithm "R B Ri Bi" until the corner piece is inserted
                         while whiteCorners[val][1] != (1, 1, 1) or whiteCorners[val][0] != ['B', 'O', 'W']:
                             self.c.sequence("R B Ri Bi")
                             whiteCornersAlgorithm += " R B Ri Bi"
                             whiteCorners = self.findWhiteCorner()
+                    # Repeat this for every piece
                     if set(whiteCorners[val][0]).issubset(['W', 'R', 'B']):
                         while whiteCorners[val][1] != (1, -1, -1):
                             self.c.sequence("B")
@@ -658,7 +675,7 @@ class SolveCube:
             return whiteCornersAlgorithm
         except:
             return None
-
+    # Commenting
     def solveSecondLayer(self):
         second_layer_algorithm = " "
         whiteCorners = self.findWhiteCorner()
@@ -1181,3 +1198,41 @@ class SolveCube:
             solve_list = [stage_1 , stage_2 , stage_3 , stage_4 , stage_5 , stage_6 , stage_7]
             return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 
+    def generateScramble(self):
+        notation = [" R ", " U ", " F ", " L ", " B ", "  D ", " Ri ", " Ui ", " Fi ", " Li ", " Bi ", "  Di "]
+        scramble = " "
+        for i in range(1, 20):
+            scramble += str(notation[random.randrange(0, 12)])
+        return scramble
+
+    def testSolver(self, testAmount):
+        # Test the cube on x number of random scrambles
+        cube_scrambles = []
+        solve_amount = []
+        scrambles_success = 0
+        scrambles_failed = 0
+        scrambles_failed_list = []
+        for i in range(int(testAmount)):
+            print("Test Number " + str(testAmount))
+            new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+            scramble = self.generateScramble()
+            new_cube.sequence(scramble)
+            self.c = new_cube
+            self.solveCube()
+            if self.c.is_solved():
+                scrambles_success += 1
+            else:
+                scrambles_failed += 1
+                scrambles_failed_list.append(scramble)
+        cube_scrambles.append(scramble)
+        print("Final Results of " + str(testAmount) + " random scrambles")
+        print("Success = " + str(scrambles_success))
+        print("Failed = " + str(scrambles_failed))
+        print("Failed Scrambles = " + str(scrambles_failed_list))
+
+
+
+
+new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+S = SolveCube(new_cube)
+S.testSolver(1)

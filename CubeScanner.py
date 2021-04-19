@@ -21,6 +21,7 @@ class CubeScanner():
 
         # Cube Faces
         face_list = ["White", "Green", "Yellow", "Blue", "Red", "Orange"]
+        face_up_list = ["Orange", "Orange", "Orange", "Orange", "White", "Yellow"]
         face_index = 0
 
         white_face = []
@@ -45,8 +46,11 @@ class CubeScanner():
         bottom_middle_color = (255, 255, 255)
         bottom_right_color = (255, 255, 255)
 
-
+        # Declaring Text On Screem
         text = "Please Scan The " + face_list[face_index] + " Face"
+        subtext = "With the " + face_up_list[face_index] + " face, facing upwards."
+        close_text = "Press 'ESC' To Close"
+
 
         cap = cv2.VideoCapture(0)
 
@@ -99,18 +103,35 @@ class CubeScanner():
             elif (smallestValue == 5):
                 return "Blue"
 
-        def createCubeString(arr):
-            list = arr.tolist()
-            print(list)
-
-
         while True:
             ret, frame = cap.read()
+
             text_size = cv2.getTextSize(text, font, 1, 2)[0]
+            # Main Instructions Text
             textX = (frame.shape[1] - text_size[0]) // 2
             textY = (frame.shape[0] + text_size[1]) // 6
 
-            cv2.putText(frame, text, (textX, textY), font, 1, (0, 0, 0), 2)
+            # Sub Text
+            subtextX = (frame.shape[1] - text_size[0]) // 2
+            subtextY = (frame.shape[0] + text_size[1]) // 6
+
+            # Rectangle Behind Instructions
+            cv2.rectangle(frame, (330, 60), (1000, 160), (255, 255, 255), -1)
+
+            # Rectangle Behind Close Scanner Text
+            cv2.rectangle(frame, (5, 670), (345, 710), (255, 255, 255), -1)
+
+
+            # Text On Screen
+            # Instructions
+            cv2.putText(frame, text, (textX, textY-30), font, 1, (0, 0, 0), 2)
+            cv2.putText(frame, subtext, (subtextX - 60, (subtextY + 50)-30), font, 1, (0, 0, 0), 2)
+            # Close Scanner
+            cv2.putText(frame, close_text, (10,700), font, 1, (0, 0, 0), 2)
+
+
+
+
             cv2.rectangle(frame, (480, 200), (530, 250), (192, 192, 192), thickness=3)
             cv2.rectangle(frame, (615, 200), (665, 250), (192, 192, 192), thickness=3)
             cv2.rectangle(frame, (750, 200), (800, 250), (192, 192, 192), thickness=3)
@@ -201,13 +222,12 @@ class CubeScanner():
                     rubiks_cube[face_index] = full_cube
                     face_index += 1
                     text = "Please Scan The " + face_list[face_index] + " Face"
+                    subtext = "With the " + face_up_list[face_index] + " Face, facing upwards."
                 else:
                     text = "Please Scan the " + face_list[face_index] + " Face"
-
-    # def createCubeString(self, cube):
-    #     return cube
-
-
-# c = CubeScanner()
-# fullcube = c.scan()
-# cubeString = c.createCubeString(fullcube)
+                    subtext = "With the " + face_up_list[face_index] + " Face, facing upwards."
+            elif key == 27:
+                cv2.destroyAllWindows()
+                for i in range(1, 5):
+                    cv2.waitKey(1)
+                return None

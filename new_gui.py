@@ -16,7 +16,7 @@ from tkmacosx import Button as btn
 root = Tk()
 edit_mode = False
 current_color = " "
-
+dark_mode_active = False
 settings_open = False
 
 # These next lines define size, position and title of tkinter window
@@ -275,8 +275,8 @@ def notationToMove(move):
         "Bi": "Back Layer Right",
         "D": "Bottom Layer Right",
         "Di": "Bottom Layer Left",
-        "M": "Middle Layer Up",
-        "Mi": "Middle Layer Down"
+        "M": "Middle Layer Down",
+        "Mi": "Middle Layer Up"
     }
     return notation.get(move)
 
@@ -333,47 +333,50 @@ def stepByStepSolve():
 def scanCube():
     c = CubeScanner()
     fullcube = c.scan()
-    print(fullcube)
-    colors = {"White": "W", "Yellow": "Y", "Red": "R", "Green": "G", "Orange": "O", "Blue": "B"}
-    cube_string = ""
-    # Layer 1
-    # Orange Face
-    for val in np.nditer(fullcube[5]):
-        cube_string += colors.get(str(val))
-    # Layer 2 (Top Row From Green-White-Blue-Yellow)
-    for val in np.nditer(fullcube[1][0]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[0][0]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[3][0]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[2][0]):
-        cube_string += colors.get(str(val))
-    # Layer 2 (Middle Row From Green-White-Blue-Yellow)
-    for val in np.nditer(fullcube[1][1]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[0][1]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[3][1]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[2][1]):
-        cube_string += colors.get(str(val))
-    # Layer 3 (Bottom Row From Green-White-Blue-Yellow)
-    for val in np.nditer(fullcube[1][2]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[0][2]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[3][2]):
-        cube_string += colors.get(str(val))
-    for val in np.nditer(fullcube[2][2]):
-        cube_string += colors.get(str(val))
-    # Red Face
-    for val in np.nditer(fullcube[4]):
-        cube_string += colors.get(str(val))
+    if fullcube == None:
+        return None
+    else:
+        print(fullcube)
+        colors = {"White": "W", "Yellow": "Y", "Red": "R", "Green": "G", "Orange": "O", "Blue": "B"}
+        cube_string = ""
+        # Layer 1
+        # Orange Face
+        for val in np.nditer(fullcube[5]):
+            cube_string += colors.get(str(val))
+        # Layer 2 (Top Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][0]):
+            cube_string += colors.get(str(val))
+        # Layer 2 (Middle Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][1]):
+            cube_string += colors.get(str(val))
+        # Layer 3 (Bottom Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][2]):
+            cube_string += colors.get(str(val))
+        # Red Face
+        for val in np.nditer(fullcube[4]):
+            cube_string += colors.get(str(val))
 
-    print("String = " + cube_string)
-    updateCube(cube_string)
-    updateCubeColours()
+        print("String = " + cube_string)
+        updateCube(cube_string)
+        updateCubeColours()
 
 
 def displaySummary(algo, cube_str):
@@ -515,10 +518,10 @@ def sbsSolve(algo):
             move.set("Move: There are no more moves.")
             clear_move.set("Word: There are no more moves.")
 
+
+# Open Settings
 def openSettings():
     global settings_open
-    from PIL import ImageTk, Image
-
     # Toplevel object which will
     # be treated as a new window
     newWindow = Toplevel(root)
@@ -584,7 +587,6 @@ def openSettings():
     reset_app_button.place(x=200, y=340)
 
     def theme_dark():
-
         # Colours
         main_bg = "#232323"
         listbox_bg = "#2E2E2E"
@@ -690,10 +692,96 @@ def openSettings():
         github_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
         reset_app_button.config(highlightbackground=button_outer, fg=button_fg, bg=button_bg)
 
-
     newWindow.grab_set()
 
-# Global variables for current move...
+# Open Quickstart
+def openQuickStart():
+    quickStart = Toplevel(root)
+
+    # sets the title of the
+    # Toplevel widget
+    quickStart.title("Getting Started")
+
+    # sets the geometry of toplevel
+    quickStart.geometry("800x740")
+
+    # Declaring notebook
+    my_notebook = ttk.Notebook(quickStart)
+    my_notebook.pack()
+
+    getting_started = Frame(my_notebook, width=800,height=400)
+    getting_started.pack()
+
+    cube_scanner = Frame(my_notebook, width=800,height=400)
+    cube_scanner.pack()
+
+    cube_notation = Frame(my_notebook, width=800,height=400)
+    cube_notation.pack()
+
+    drawing_cube = Frame(my_notebook, width=800, height=400)
+    drawing_cube.pack()
+
+    solving_options = Frame(my_notebook, width=800, height=400)
+    solving_options.pack()
+
+    my_notebook.add(getting_started, text='Getting Started')
+    my_notebook.add(cube_scanner, text='Scan Your Cube')
+    my_notebook.add(cube_notation, text='Cube Notation')
+    my_notebook.add(drawing_cube, text='Draw Your Cube')
+    my_notebook.add(solving_options, text='Solving Your Cube')
+
+    # Different Pages
+
+    # Getting Started:
+    getting_started_title = Label(getting_started, text=" \n Getting Started \n").pack()
+    # Main Text
+    p1 = open("Text/Getting Started/gettingstarted.txt")
+    p1_content = p1.read()
+    para1 = Label(getting_started, text=p1_content).pack()
+    # Image
+    main_app_image = PhotoImage(file='Images/Getting Started Images/Getting Started/main_app_photo.gif')
+    image_label = Label(getting_started, image=main_app_image)
+    image_label.photo = main_app_image
+    image_label.pack()
+
+    # Scanning Your Cube
+    cube_scanner_title = Label(cube_scanner, text="\n Scanning Your Own Cube \n ").pack()
+    scanner_p1 = open("Text/Scan Your Cube/scanningcube.txt")
+    scanner_p1_content = scanner_p1.read()
+    scanner_para1 = Label(cube_scanner, text=scanner_p1_content).pack()
+
+    cube_scanner_image = PhotoImage(file="Images/Getting Started Images/Cube Scanner/cube_scanner__image.gif")
+    scanner_image_label = Label(cube_scanner, image=cube_scanner_image)
+    scanner_image_label.photo = cube_scanner_image
+    scanner_image_label.pack()
+
+
+    # Cube Notation
+    cube_notation_title = Label(cube_notation, text="\n Cube Notation\n ").pack()
+    notation_p1 = open("Text/Cube Notation/cubenotation.txt")
+    notation_p1_content = notation_p1.read()
+    notation_para1 = Label(cube_notation, text=notation_p1_content).pack()
+
+    # Images
+    cube_notation_images = PhotoImage(file="Images/Getting Started Images/Notation/cube_notation_image.gif")
+    cube_notation_image_label = Label(cube_notation, image=cube_notation_images)
+    cube_notation_image_label.photo = cube_notation_images
+    cube_notation_image_label.pack()
+
+    # Para 2
+    notation_p2 = open("Text/Cube Notation/cubenotation_para2.txt")
+    notation_p2_content = notation_p2.read()
+    notation_para2 = Label(cube_notation, text=notation_p2_content).pack()
+
+
+    # Drawing Your Cube
+    drawing_cube_title = Label(drawing_cube, text="\n Drawing Your Cube Digitally\n ").pack()
+
+    # Solving Your Cube
+    solving_options_title = Label(solving_options, text="\n Solving Your Cube\n ").pack()
+
+
+
 
 
 
@@ -844,19 +932,19 @@ cubeCanvas.tag_bind("red_22", "<Button-1>", editColor)
 
 
 # Label For Main Title
-title = Label(root, text="Rubiks Cube Solver")
+title = Label(root, text="Rubik's Cube Solver")
 title.config(font=("Courier", 30))
-title.place(x=1045, y=30)
+title.place(x=1040, y=30)
 
 # Label For Subtitle
-subTitle = Label(root, text="Project By Ryan Jewsbury")
+subTitle = Label(root, text="Project by Ryan Jewsbury")
 subTitle.config(font=("Arial", 20))
 subTitle.place(x=1090, y=60)
 
 # More Information Button
-moreInfo = btn(root, text="More Info", command=lambda: print("More info"),bg="#EEEEEE", fg="#000",highlightbackground="white" )
-moreInfo.config(font=("Arial", 15))
-moreInfo.place(x=1100, y=100)
+quickStartButton = btn(root, text="More Info", command=lambda: openQuickStart(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+quickStartButton.config(font=("Arial", 15))
+quickStartButton.place(x=1100, y=100)
 
 # Settings Button
 settingsButton = btn(root, text="Settings", command=lambda: openSettings(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
@@ -864,6 +952,8 @@ settingsButton.config(font=("Arial", 15))
 settingsButton.place(x=1230, y=100)
 
 # Scan Your Own Cube Label
+
+#SCAN YOUR CUBE..
 scan_title = Label(root, text="Scan Your Own Cube")
 scan_title.config(font=("Arial", 20))
 scan_title.place(x=1110, y=150)
@@ -926,6 +1016,11 @@ solve_listbox = Listbox(root)
 solve_listbox.place(x=1137,y=480)
 
 
+# NOT MORE INFORMATION
+# QUICK START GUIDE HER
+
+# EVALUATION CHAPTER
+
 
 
 sbsButton = btn(root, text="Step By Step Solve", command=lambda: stepByStepSolve(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
@@ -942,5 +1037,27 @@ resetButton.config(font=("Arial", 15))
 resetButton.place(x=1220, y=700)
 
 
+# ENSURE DEMO RAISE POINT ABOUT CUBE VALIDATION
+
 root.resizable(False, False)
 root.mainloop()
+
+# TODO
+# More info becomes quick start guide - photos etc
+# Finish dark mode - fix bug on switching from dark mode to light mode
+# Implement sounds
+# Link to github
+# Close and restart buttons functionality
+# Ask stephen about mac development.
+# OPENCVV MAKE MORE CLEAR
+
+
+# Quick Start:
+# Tabs = [
+# Getting started
+# Scan Cube
+# Notation
+# Making your own move
+# Building Your digital cube
+# Solving
+# ]

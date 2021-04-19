@@ -1,0 +1,12 @@
+With this program, you can scan your own cube.
+In order to understand how to use the scanner, I will quickly explain what a cube 'Face' is, as this is referred to
+alot in the program (more on this in Cube Notation Tab)
+
+The center piece of any face on the cube, is how the entire face is referred too.For example, on any scrambled cube
+face, the center points will always stay the same, with there only being one of each colour, on each of the 6 sides.
+
+If you would like to find the white face, rotate the cube until you see the White center piece. This is the white face.
+
+The cube scanner will not let you scan any other face, aside from the one it is asking for.
+
+In order to use the scanner, you press 'SPACEBAR' to scan the face, and 'ENTER' to submit the scan.

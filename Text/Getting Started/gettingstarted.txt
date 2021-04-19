@@ -1,0 +1,16 @@
+Welcome to my Rubik's Cube Solver! If this is your first time using this program, there are a few things you might want
+know before getting started.
+
+Firstly across the top of this page, you can see five different tabs, each referring to a different aspect of this program,
+with which you can then choose how you would like to use it. I recommend familiarising yourself with Cube Notation,
+as this program is heavily based around this notation, and is integral to understanding how the program works.
+
+With this program you can:
+
+A). Scan Your Own Cube, using your webcam using 'Scan Cube'
+
+B). Draw Your cube digitally using 'Enter Edit Mode'
+
+C). Play around, using random scrambles, and making moves using Cube Notation
+
+D). Challange yourself to solve the cube using step-by-step solve to check your progress

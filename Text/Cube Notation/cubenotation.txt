@@ -1,0 +1,7 @@
+As with any algorithm, it is essentially a set of moves, that when executed achives a task. This is the same for
+cube algorithms. These algorithms will be a concatenation of different cube notation, that moves the cube in a specific
+way, to formulate different shapes, designed to build the cube up in order to solve it.
+
+Here is an example of the cube notation used in this program
+
+(credit to https://medium.com/@maxdeutsch/m2m-day-69-decoding-rubiks-cube-algorithms-6ea7e7704ec9)
