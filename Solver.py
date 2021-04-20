@@ -2,6 +2,8 @@ from rubik.cube import Cube
 from rubik_solver import utils
 import pycuber as pc
 import random
+
+
 class SolveCube:
     def __init__(self, cube):
         self.c = cube
@@ -22,7 +24,6 @@ class SolveCube:
                 if colour in item[0]:
                     mysortedlist.append(item)
 
-
         return mysortedlist
 
     def findWhiteCorner(self):
@@ -41,14 +42,23 @@ class SolveCube:
     def findMiddleLayerPiece(self, cornerPiece):
         target_colours = []
         target_piece = []
+        # Take a given corner piece
         for val in cornerPiece:
+            # Find the two colours on the piece (not white)
             if val != "W":
+                # Append these colours to the target colours list
                 target_colours.append(val)
+        # Add 'None' to the list, so it has the same structure as a cubie ["R", "G", None]
         target_colours.append(None)
+        # Loop through all pieces on cube
         for piece in self.c.pieces:
+            # Find all edge pieces
             if piece.type == "edge":
+                # Find all edge pieces that contain the target colours
                 if set(piece.colors).issubset(target_colours):
+                    # Append these values to a list
                     target_piece.append([piece.colors, piece.pos])
+        # Return the list
         return target_piece
 
     def convertAlgo(self, algo):
@@ -84,7 +94,7 @@ class SolveCube:
             if move == "Li":
                 new_algo += (" Li")
         return new_algo
-    # Commented
+
     def solveWhiteCross(self):
         white_pieces = self.findWhiteEdge()
         possible_faces = ["B", "G", "O", "R"]
@@ -469,7 +479,6 @@ class SolveCube:
         # print("White Cross Solved")
         # print("White Cross Algorithm = ", cross_algorithm)
         return cross_algorithm
-    # Commented
 
     def solveWhiteCorner(self):
         whiteCorners = self.findWhiteCorner()
@@ -573,62 +582,92 @@ class SolveCube:
             return whiteCornersAlgorithm
         except:
             return None
-    # Commenting
+
     def solveSecondLayer(self):
         second_layer_algorithm = " "
+        # We have to find the white corners again, to find middle layer pieces
         whiteCorners = self.findWhiteCorner()
-        order = ["First - Blue/White/Orange", "Second - Blue/White/Red", "Third - Green/Orange/White",
-                 "Fourth - Green/Red/White"]
+
+        # Code encased in try and catch, in case of any errors
         try:
+            # Loop through all the white corners
             for val in range(len(whiteCorners)):
+                # Find middle layer piece, based on current white corner
                 currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
                 # Third index being 0 means they sit in the same level... middle layer...
+                # We check the first position (1,1,0) above white / blue / orange
                 if currentEdgePiece[0][1] == (1, 1, 0):
-                    # Check if in correct place...
-                    if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]) and currentEdgePiece[0][0] == ["B", "O",
-                                                                                                             None]:
-                        print("piece in correct location")
+                    # If the piece is above white blue orange, we check if it blue and orange (correct piece)
+                    # This checks content, and orientation of the piece
+                    if (set(currentEdgePiece[0][0]).issubset(['B', 'O', None])
+                            and currentEdgePiece[0][0] == ["B", "O", None]):
+                        # Piece in correct location - so we move on.
+                        pass
                     else:
+                        # If it is not the correct piece (not blue and orange)
+                        # We remove it from its location, using a algorithm which removes both the corner piece
+                        # And the edge piece, but only puts back the corner piece, so we can insert the edge
+                        # Piece into the correct location later.
                         self.c.sequence("R B Ri Bi Ui Bi U B")
+                        # We then update the middle layer pieces list
                         currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        # And append the sequence onto the algorithm for the solver.
                         second_layer_algorithm += " R B Ri Bi Ui Bi U B"
+                        # This is then repeated for all 4 possible edge pieces (Blue Orange, Blue Red,
+                        # Red Green, Green Orange)
                 if currentEdgePiece[0][1] == (1, -1, 0):
-                    if set(currentEdgePiece[0][0]).issubset(['B', 'R', None]) and currentEdgePiece[0][0] == ['B', 'R',
-                                                                                                             None]:
-                        print("piece in correct location")
+                    if (set(currentEdgePiece[0][0]).issubset(['B', 'R', None])
+                            and currentEdgePiece[0][0] == ['B', 'R',None]):
+                        # Piece in correct location
+                        pass
                     else:
                         self.c.sequence("D B Di Bi Ri Bi R B")
                         currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
                         second_layer_algorithm += " D B Di Bi Ri Bi R B"
                 if currentEdgePiece[0][1] == (-1, 1, 0):
-                    if set(currentEdgePiece[0][0]).issubset(['G', 'O', None]) and currentEdgePiece[0][0] == ['G', 'O',
-                                                                                                             None]:
-                        print("piece in correct location")
+                    if (set(currentEdgePiece[0][0]).issubset(['G', 'O', None])
+                            and currentEdgePiece[0][0] == ['G', 'O',None]):
+                        # Piece in correct location
+                        pass
                     else:
                         self.c.sequence("Li Bi L B U B Ui Bi")
                         currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
                         second_layer_algorithm += " Li Bi L B U B Ui Bi"
                 if currentEdgePiece[0][1] == (-1, -1, 0):
-                    if set(currentEdgePiece[0][0]).issubset(['G', 'R', None]) and currentEdgePiece[0][0] == ['G', 'R',
-                                                                                                             None]:
-                        print("piece in correct location")
+                    if (set(currentEdgePiece[0][0]).issubset(['G', 'R', None])
+                            and currentEdgePiece[0][0] == ['G', 'R',None]):
+                        # Piece in correct location
+                        pass
                     else:
                         self.c.sequence("L B Li Bi Di Bi D B")
                         currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
                         second_layer_algorithm += " L B Li Bi Di Bi D B"
+
+                # Stage 2 - Edge piece now on yellow face pos(x,y,-1) and ready to be inserted
                 if currentEdgePiece[0][1][2] == -1:
-                    # Under the assumption that the white corner piece is in the correct place
+                    # Under the assumption that the white corner piece is in correct place
+                    # Checking for blue and orange edge piece
                     if set(currentEdgePiece[0][0]).issubset(['B', 'O', None]):
                         if currentEdgePiece[0][0] == ["B", None, "O"] or currentEdgePiece[0][0] == [None, "B", "O"]:
                             # Target needs to be (0,-1,-1)
+                            # We twist by 'B' until the piece is ABOVE the the desired corner location
                             while currentEdgePiece[0][1] != (0, -1, -1):
+                                # Making the move
                                 self.c.sequence("B")
+                                # Appending the move to the algorithm for the solver
                                 second_layer_algorithm += " B"
+                                # Updating the middle layer pieces
                                 currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                            # When the edge piece is above the target corner piece
                             if currentEdgePiece[0][1] == (0, -1, -1):
+                                # We insert it using a pre-determined algorithm
                                 self.c.sequence("Ui Bi U B R B Ri Bi")
+                                # Append the moves to the algorithm for the solver
                                 second_layer_algorithm += " Ui Bi U B R B Ri Bi"
+                                # The piece is now inserted, so we update the edge piece list.
                                 currentEdgePiece = self.findMiddleLayerPiece(whiteCorners[val][0])
+                        # This is then repeated for every colour, in both orientations (8 combinations)
+
                         if currentEdgePiece[0][0] == [None, "O", "B"] or currentEdgePiece[0][0] == ["O", None, "B"]:
                             while currentEdgePiece[0][1] != (-1, 0, -1):
                                 self.c.sequence("B")
@@ -710,8 +749,6 @@ class SolveCube:
             return None
 
     def solveYellowCross(self):
-        # If Y == 2nd index - yellow is pointing up
-
         yellow_cross_algorithm = ""
         # Check If Cross Already Exists:
         yellowCrossSolved = [
@@ -720,7 +757,7 @@ class SolveCube:
             self.c.get_piece(0, -1, -1).colors[2] == "Y",
             self.c.get_piece(-1, 0, -1).colors[2] == "Y"]
 
-        # Conditions For First look OLL LINE
+        # Line Conditions
         line_condition_one = [
             self.c.get_piece(0, 1, -1).colors[2] == "Y",
             self.c.get_piece(0, 0, -1).colors[2] == "Y",
@@ -732,14 +769,16 @@ class SolveCube:
             self.c.get_piece(0, 0, -1).colors[2] == "Y",
             self.c.get_piece(-1, 0, -1).colors[2] == "Y"
         ]
-        # Conditions For First Look OLL L
+
+
+        # L Conditions
         # L At Top Right
         l_condition_one = [
             self.c.get_piece(0, 1, -1).colors[2] == "Y",
             self.c.get_piece(0, 0, -1).colors[2] == "Y",
             self.c.get_piece(-1, 0, -1).colors[2] == "Y"]
 
-        # L At Top Left # This is the target
+        # L At Top Left  (This is the target location)
         l_condition_two = [
             self.c.get_piece(0, 1, -1).colors[2] == "Y",
             self.c.get_piece(0, 0, -1).colors[2] == "Y",
@@ -758,64 +797,90 @@ class SolveCube:
             self.c.get_piece(-1, 0, -1).colors[2] == "Y"]
 
         try:
+            # Check if yellow cross already solved, if so, move onto next stage.
             if all(yellowCrossSolved):
-                print("The Yellow Cross Is Already Solved...")
-            # Conditions For Line Found
+                pass
+            # Conditions For Line Found (if either cases are found)
             elif all(line_condition_one) or all(line_condition_two):
+                # If it is case one, it is already in the correct position
                 if line_condition_two == [True, True, True]:
+                    # Perform algorithm to solve yellow cross
                     algorithm = "F R U Ri Ui Fi"
+                    # Makes use of convertAlgo method to adapt to different faces
                     newAlgo = self.convertAlgo(algorithm)
+                    # Append the moves to the algorithm for the solver
                     yellow_cross_algorithm += newAlgo
                     self.c.sequence(newAlgo)
                 elif line_condition_one == [True, True, True]:
+                    # If a line case is found that is in the wrong orientation
                     if line_condition_one == [True, True, True]:
+                        # Move by 'B', so it is in the correct position
                         self.c.sequence("B")
                         yellow_cross_algorithm += " B"
+                        # Perform an algorithm to insert solve the yellow cross
                         algorithm = "F R U Ri Ui Fi"
+                        # Makes use of convertAlgo method to adapt to different faces
                         newAlgo = self.convertAlgo(algorithm)
+                        # Append the moves to the algorithm for the solver
                         yellow_cross_algorithm += newAlgo
                         self.c.sequence(newAlgo)
-            # Conditions for L found -
+
+            # L Found
+            # Check if any of the L shape cases have been found:
             elif all(l_condition_one) or all(l_condition_two) or all(l_condition_three) or all(
                     l_condition_four) and not all(yellowCrossSolved):
+                # Check for individual cases, and make different algorithms depending on which case
+                # Has been found
                 if l_condition_two == [True, True, True]:
+                    # This is the same algorithm used in all cases, however, some cases require the
+                    # Cube to be rotated before performing the algorithm (needs B or Bi)
                     self.c.sequence("D B L Bi Li Di")
                     yellow_cross_algorithm += " D B L Bi Li Di"
                 elif not l_condition_two == [True, True, True]:
                     if l_condition_one == [True, True, True]:
+                        # Added a Bi before algorithm to rotate cube towards target location
                         self.c.sequence("Bi D B L Bi Li Di")
                         yellow_cross_algorithm += " Bi D B L Bi Li Di"
                     elif l_condition_three == [True, True, True]:
+                        # Added a B before algorithm to rotate cube towards target location
                         self.c.sequence("B D B L Bi Li Di")
                         yellow_cross_algorithm += " B D B L Bi Li Di"
                     elif l_condition_four == [True, True, True]:
+                        # Added B B before algorithm to rotate cube towards target location
                         self.c.sequence("B B D B L Bi Li Di")
                         yellow_cross_algorithm += " B B D B L Bi Li Di"
-            # Dot Scenorio
+
+            # Dot Found
+            # Check if non of the other cases have been found (this means Dot HAS been found)
             elif (not all(l_condition_one) and not all(l_condition_two) and not all(l_condition_three) and not all(
                     l_condition_four)
                   and not all(yellowCrossSolved)
                   and not all(line_condition_two) and not all(line_condition_one)):
+                # Perform algorithm to solve yellow cross
                 self.c.sequence("U R B Ri Bi Ui")
                 self.c.sequence("D B L Bi Li Di")
+                # Append moves to yellow cross algorithm
                 yellow_cross_algorithm += " U R B Ri Bi Ui D B L Bi Li Di"
-            # print("Yellow Cross Solved")
-            # print("Yellow Cross Algorithm = " + yellow_cross_algorithm)
+            # Return the algorithm
             return yellow_cross_algorithm
         except:
             return None
+    # Up to here now
 
     def orientLastLayer(self):
         # Cases
         oll_algorithm = " "
-        # # Check Full Yellow Face
+        # Check to see if this solved the cube already (can happen occasionally)
         if self.c.is_solved():
             return oll_algorithm
         else:
             itter = 0
             for i in range(1, 5):
                 itter += 1
+                # Rotate the cube once, (total of four times)
+                # Attempt to find one of the 7 cases, and then perform and algorithm
                 self.c.sequence("B")
+                # Append the cube rotation onto the algorithm for the solver
                 oll_algorithm += " B"
                 # Anti Sune Case...
                 if (self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
@@ -827,6 +892,7 @@ class SolveCube:
                         self.c.get_piece(0, 0, -1).colors[2] == "Y" and
                         self.c.get_piece(-1, 0, -1).colors[2] == "Y" and
                         self.c.get_piece(0, -1, -1).colors[2] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("Li Bi L Bi Li B B L")
                     oll_algorithm += " Li Bi L Bi Li B B L"
                     break
@@ -835,6 +901,7 @@ class SolveCube:
                       self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
                       self.c.get_piece(1, -1, -1).colors[0] == "Y" and
                       self.c.get_piece(-1, 1, -1).colors[2] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("R B Ri B R B B Ri")
                     oll_algorithm += " R B Ri B R B B Ri"
                     break
@@ -843,6 +910,7 @@ class SolveCube:
                       self.c.get_piece(1, 1, -1).colors[1] == "Y" and
                       self.c.get_piece(1, -1, -1).colors[2] == "Y" and
                       self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("R R F Ri B B R Fi Ri B B Ri")
                     oll_algorithm += " R R F Ri B B R Fi Ri B B Ri"
                     break
@@ -851,6 +919,7 @@ class SolveCube:
                       self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
                       self.c.get_piece(-1, -1, -1).colors[1] == "Y" and
                       self.c.get_piece(1, -1, -1).colors[1] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("U R B Ri Bi R B Ri Bi R B Ri Bi Ui")
                     oll_algorithm += " U R B Ri Bi R B Ri Bi R B Ri Bi Ui"
                     break
@@ -859,6 +928,7 @@ class SolveCube:
                       self.c.get_piece(1, -1, -1).colors[1] == "Y" and
                       self.c.get_piece(-1, 1, -1).colors[0] == "Y" and
                       self.c.get_piece(-1, -1, -1).colors[0] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("R B B Ri Ri Bi R R Bi Ri Ri B B R")
                     oll_algorithm += " R B B Ri Ri Bi R R Bi Ri Ri B B R"
                     break
@@ -867,6 +937,7 @@ class SolveCube:
                       self.c.get_piece(1, -1, -1).colors[2] == "Y" and
                       self.c.get_piece(-1, 1, -1).colors[1] == "Y" and
                       self.c.get_piece(-1, -1, -1).colors[1] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("L U Ri Ui Li U R Ui")
                     oll_algorithm += " L U Ri Ui Li U R Ui"
                     break
@@ -875,26 +946,29 @@ class SolveCube:
                       self.c.get_piece(1, -1, -1).colors[0] == "Y" and
                       self.c.get_piece(1, 1, -1).colors[2] == "Y" and
                       self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                    # Perform moves and append to algorithm
                     self.c.sequence("Ri U R Di Ri Ui R D")
                     oll_algorithm += " Ri U R Di Ri Ui R D"
                     break
-                # OLL Already Solved (Yellow Face comeple)
+                # Checks whether OLL has already been solved, if so, return an empty oll algorithm
                 elif (self.c.get_piece(1, 1, -1).colors[2] and self.c.get_piece(0, 1, -1).colors[2] and
-                    self.c.get_piece(-1, 1, -1).colors[2] and self.c.get_piece(1, 0, -1).colors[2] and
-                    self.c.get_piece(0, 0, -1).colors[2] and self.c.get_piece(-1, 0, -1).colors[2] and
-                    self.c.get_piece(1, -1, -1).colors[2] and self.c.get_piece(0, -1, -1).colors[2] and
-                    self.c.get_piece(-1, -1, -1).colors[2]) == "Y":
+                      self.c.get_piece(-1, 1, -1).colors[2] and self.c.get_piece(1, 0, -1).colors[2] and
+                      self.c.get_piece(0, 0, -1).colors[2] and self.c.get_piece(-1, 0, -1).colors[2] and
+                      self.c.get_piece(1, -1, -1).colors[2] and self.c.get_piece(0, -1, -1).colors[2] and
+                      self.c.get_piece(-1, -1, -1).colors[2]) == "Y":
                     oll_algorithm += ""
                 else:
+                    # If we have looped over 4 times and no cases have been found, there is an error
+                    # So return None
                     if itter == 4:
                         print("We couldn't find any cases....")
                         return None
-            # print("OLL Solved")
-            # print("OLL Algorithm = " + oll_algorithm)
+            # Return the completed algorithm
             return oll_algorithm
 
     def solveFinalCorners(self):
         final_corner_algorithm = ""
+        # Check if cube is already solved at this point
         if self.c.is_solved():
             return final_corner_algorithm
         else:
@@ -903,42 +977,51 @@ class SolveCube:
                     self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] and
                     self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] and
                     self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]):
-                print("")
+                # All corners match, this stage can be skipped, as the corners are solved
+                pass
+            # Case for non of the corners matching
             elif (self.c.get_piece(-1, 1, -1).colors[1] != self.c.get_piece(1, 1, -1).colors[1] and
                   self.c.get_piece(1, 1, -1).colors[0] != self.c.get_piece(1, -1, -1).colors[0] and
                   self.c.get_piece(1, -1, -1).colors[1] != self.c.get_piece(-1, -1, -1).colors[1] and
                   self.c.get_piece(-1, 1, -1).colors[0] != self.c.get_piece(-1, -1, -1).colors[0]):
                 self.c.sequence("U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui")
                 final_corner_algorithm += " U R Bi Ri Bi R B Ri Ui R B Ri Bi Ri U R Ui"
+            # If some one or more of the corners match - we have a line
             else:
+                # Cases for finding a line, it then has to be moved onto the left side.
                 if self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1]:
+                    # Algorithm for line, but having to move yellow face once to the left first
                     self.c.sequence("B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
                     final_corner_algorithm += " B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
                 elif self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0]:
+                    # Algorithm for line, but having to move yellow face twice to the left first
                     self.c.sequence("B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
                     final_corner_algorithm += " B B R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
                 elif self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1]:
+                    # Algorithm for line, but having to move yellow face once to the right first
                     self.c.sequence("Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
                     final_corner_algorithm += " Bi R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
                 elif self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]:
+                    # Algorithm for line, in the correct place
                     self.c.sequence("R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui")
                     final_corner_algorithm += " R B Ri Bi Ri U R R Bi Ri Bi R B Ri Ui"
                 else:
+                    # No cases found, this means an error has occurred.
                     print("No Cases Found..")
                     return None
-            # print("Final Corners Solved")
-            # print("Final Corners Algorithm = " + final_corner_algorithm)
+            # Return the final corner algorithm
             return final_corner_algorithm
 
     def solveFinalEdge(self):
-        solved_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
         final_edge_algorithm = " "
-        if self.c == solved_cube:
-            print("Cube Is Already Solved! (Skip Stage 7)")
+        # Check if the cube is already solved
+        if self.c.is_solved():
+            # Cube Already solved, return empty algorithm.
             return final_edge_algorithm
+
         # First Check is to check if any entire side matches (corner, edge, corner)
         else:
-            # check all values on yellow face == yellow
+            # Check all values on yellow face equal yellow (validation check)
             if (self.c.get_piece(1, 1, -1).colors[2] == "Y" and
                     self.c.get_piece(0, 1, -1).colors[2] == "Y" and
                     self.c.get_piece(-1, 1, -1).colors[2] == "Y" and
@@ -948,70 +1031,88 @@ class SolveCube:
                     self.c.get_piece(1, -1, -1).colors[2] == "Y" and
                     self.c.get_piece(0, -1, -1).colors[2] == "Y" and
                     self.c.get_piece(-1, -1, -1).colors[2] == "Y"):
+                # All cubes are yellow, so we continue on
                 pass
             else:
                 return None
+
+            # Check if each side is already solved, but not aligned correctly
             if (self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] ==
-                    self.c.get_piece(0, 1, -1).colors[
-                        1] == self.c.get_piece(0, 1, -1).colors[1] and
+                    self.c.get_piece(0, 1, -1).colors[1] == self.c.get_piece(0, 1, -1).colors[1] and
                     self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] ==
-                    self.c.get_piece(1, 0, -1).colors[
-                        0] == self.c.get_piece(1, 0, -1).colors[0] and
+                    self.c.get_piece(1, 0, -1).colors[0] == self.c.get_piece(1, 0, -1).colors[0] and
                     self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] ==
                     self.c.get_piece(0, -1, -1).colors[1] == self.c.get_piece(0, -1, -1).colors[1] and
                     self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, 0, -1).colors[0] ==
                     self.c.get_piece(-1, -1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]):
-                while self.c.is_solved() == False:
+                # Cube nearly solved, so until it is, rotate the top face around.
+                while not self.c.is_solved():
+                    # Make move, and append to final algorithm string
                     self.c.sequence("B")
                     final_edge_algorithm += " B"
+                # Once complete return the final edge algorithm
                 return final_edge_algorithm
-            # Case For there being a line...
+
+            # Case For there being a line
             if (self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] ==
-                    self.c.get_piece(0, 1, -1).colors[
-                        1] == self.c.get_piece(0, 1, -1).colors[1] or
+                    self.c.get_piece(0, 1, -1).colors[1] == self.c.get_piece(0, 1, -1).colors[1] or
                     self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] ==
-                    self.c.get_piece(1, 0, -1).colors[
-                        0] == self.c.get_piece(1, 0, -1).colors[0] or
+                    self.c.get_piece(1, 0, -1).colors[0] == self.c.get_piece(1, 0, -1).colors[0] or
                     self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] ==
                     self.c.get_piece(0, -1, -1).colors[1] == self.c.get_piece(0, -1, -1).colors[1] or
                     self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, 0, -1).colors[0] ==
                     self.c.get_piece(-1, -1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]):
+                # The code has found a line, we now rotate it onto the correct side, depending on its current position
                 if self.c.get_piece(-1, 1, -1).colors[1] == self.c.get_piece(1, 1, -1).colors[1] == \
-                        self.c.get_piece(0, 1, -1).colors[
-                            1] == self.c.get_piece(0, 1, -1).colors[1]:
+                        self.c.get_piece(0, 1, -1).colors[1] == self.c.get_piece(0, 1, -1).colors[1]:
+                    # Requires " B B " to be moved onto the correct side
                     self.c.sequence("B B")
                     final_edge_algorithm += " B B"
                 if self.c.get_piece(1, 1, -1).colors[0] == self.c.get_piece(1, -1, -1).colors[0] == \
-                        self.c.get_piece(1, 0, -1).colors[
-                            0] == self.c.get_piece(1, 0, -1).colors[0]:
+                        self.c.get_piece(1, 0, -1).colors[0] == self.c.get_piece(1, 0, -1).colors[0]:
+                    # Requires " Bi " to be moved onto the correct side
                     self.c.sequence("Bi")
                     final_edge_algorithm += " Bi"
                 if self.c.get_piece(1, -1, -1).colors[1] == self.c.get_piece(-1, -1, -1).colors[1] == \
                         self.c.get_piece(0, -1, -1).colors[1] == self.c.get_piece(0, -1, -1).colors[1]:
+                    # Line already on the correct side
                     pass
                 if self.c.get_piece(-1, 1, -1).colors[0] == self.c.get_piece(-1, 0, -1).colors[0] == \
                         self.c.get_piece(-1, -1, -1).colors[0] == self.c.get_piece(-1, -1, -1).colors[0]:
+                    # Requires " B " to be moved onto the correct side
                     self.c.sequence("B")
                     final_edge_algorithm += " B"
+
                 # Now line is on correct side
-                # First Case Ub Perm (R  F  Ui  Bi   D  U   Di  R  B  B   Di  B  L  R )
+                # So we check for which out of the two cases we are looking at
+                # Here I hard coded th Ub Perm, therefore an else would satisfy that of Ua Perm
                 if (self.c.get_piece(1, 0, -1).colors[0] == self.c.get_piece(1, 1, -1).colors[1] and
                         self.c.get_piece(0, 1, -1).colors[1] == self.c.get_piece(-1, 1, -1).colors[0] and
                         self.c.get_piece(-1, 0, -1).colors[0] == self.c.get_piece(1, 1, -1).colors[0]):
+                    # Line is on correct side and we have found a Ub Perm, so we perform a pre-determined algorithm
                     self.c.sequence("Mi Mi Bi M Bi Bi Mi Bi Mi Mi")
+                    # Append moves to find edge algorithm
                     final_edge_algorithm += " Mi Mi Bi M Bi Bi Mi Bi Mi Mi"
-                    while self.c.is_solved() == False:
+                    # Cube solved, but not aligned, so rotate yellow face, until all sides line up
+                    # Until the cube is solved
+                    while not self.c.is_solved():
                         self.c.sequence("B")
                         final_edge_algorithm += " B"
                 else:
+                    # If the else is triggered, it means it has found a line, but it is not the Ub case, therefore
+                    # It must be a Ua perm - so perform the Ua perm algorithm
                     self.c.sequence("Mi Mi B M B B Mi B Mi Mi")
+                    # Append moves to find edge algorithm
                     final_edge_algorithm += " Mi Mi B M B B Mi B Mi Mi"
-                    while self.c.is_solved() == False:
+                    # Cube solved, but not aligned, so rotate yellow face, until all sides line up
+                    # Until the cube is solved
+                    while not self.c.is_solved():
                         self.c.sequence("B")
                         final_edge_algorithm += " B"
+
             # No Line Found
             else:
-                # No Line Found
+                # No Line Found (Hard coded case 'H')
                 while self.c.get_piece(-1, 1, -1).colors[1] != "O":
                     self.c.sequence("B")
                     final_edge_algorithm += " B"
@@ -1034,10 +1135,7 @@ class SolveCube:
                             self.c.sequence("B")
                             final_edge_algorithm += " B"
 
-
             if self.c.is_solved():
-                # print("Final Edge Solved!")
-                # print("Final Edge Algorithm = " + final_edge_algorithm)
                 return final_edge_algorithm
             else:
                 return None
@@ -1083,7 +1181,7 @@ class SolveCube:
                 return None
             print("----------------------------------------------------------------------------------")
 
-            solve_list = [stage_1 , stage_2 , stage_3 , stage_4 , stage_5 , stage_6 , stage_7]
+            solve_list = [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6, stage_7]
             return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 
     def solveCube_(self):
@@ -1120,7 +1218,7 @@ class SolveCube:
                 print("Error Solving Final Edge")
                 return None
 
-            solve_list = [stage_1 , stage_2 , stage_3 , stage_4 , stage_5 , stage_6 , stage_7]
+            solve_list = [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6, stage_7]
             return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 
     def generateScramble(self):
@@ -1158,9 +1256,6 @@ class SolveCube:
         print("Failed Scrambles = " + str(scrambles_failed_list))
 
 
-
-
 new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
 new_cube.sequence("Bi  Fi   Di  Ri  Fi  Fi  Ui  Fi  Fi  Bi  Li   D   D  Li  R  L  F  R  Bi")
 S = SolveCube(new_cube)
-S.testSolver(1000000) # ONE MILLION TESTS

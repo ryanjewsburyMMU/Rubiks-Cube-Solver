@@ -1061,10 +1061,6 @@ solve_listbox = Listbox(root)
 solve_listbox.place(x=1137,y=480)
 
 
-# NOT MORE INFORMATION
-# QUICK START GUIDE HER
-
-# EVALUATION CHAPTER
 
 
 
@@ -1100,4 +1096,22 @@ root.mainloop()
 # FIX FINAL MOVE IF CUBE IS NOT SOLVED.
 
 # FINALLY COMMENT ALL CODE
+
+
+# NOT MORE INFORMATION
+# QUICK START GUIDE HER
+
+# EVALUATION CHAPTER - 2k words
+# 1000 words per part
+# 6.1 eval of product
+#   - subjectivity and objectivity
+#   - my subjective view of quality of product (strengths & weaknesses)
+#   - Objectivity - quantitative (proper testing) undertake (non functional) -- test dark mode for this as well
+#   - qualitative - usability / user testing (mum / dad / sister / girlfriend)
+# 6.2 eval of project approach
+#   - Identify 2/3 themes (e.g. key challenges, (setting up environment, time management, project planning, motivation))
+
+# Finish design chapter
+# Finish project
+# Start evaluation chapter
 
