@@ -70,3 +70,43 @@ GGG WWW BBG YYY
 
 
    randomScrambleButton
+
+
+
+
+
+    # Search current_cube for a particular index
+    current_cube.get_piece(-1,1,-1).colors[0]
+
+    Returns:
+    'G'
+
+    colourFromLetter( current_cube.get_piece(-1,1,-1).colors[0]  )
+
+    Returns:
+    Green
+
+    # We can then set the colour of green_00 to Green using the tag green_00 and itemconfigure
+
+    cubeCanvas.itemconfigure(green_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[0]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

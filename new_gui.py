@@ -1,551 +1,180 @@
 import random
-import time
-
 from rubik.cube import Cube
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from CubeScanner import CubeScanner
-from Solver import SolveCube
 import numpy as np
-from fpdf import FPDF
 from tkmacosx import Button as btn
 import pygame
 
-pygame.mixer.init()  # initialise the pygame
+# Importing My code for solver and scanner
+from CubeScanner import CubeScanner
+from Solver import SolveCube
 
-def play():
-    file_num = random.randrange(1,12)
-    file = ("SoundEffects/Cube Moves/move_"+ str(file_num)+".mp3")
-    pygame.mixer.music.load(file)
-    pygame.mixer.music.play(loops=0)
+# Initilise pygame (used for playing audio)
+pygame.mixer.init()
 
 
 # Global Variables
-root = Tk()
+# This variable controls how the cube looks through out the program, and how it is mapped onto the digital cube.
+current_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+# Variable for whether the user is using edit mode
 edit_mode = False
+# Variable for selecting which colour you want in edit mode
 current_color = " "
+# Variable for whether dark mode is active or not.
 dark_mode_active = False
-settings_open = False
+# Variable for mute being active or disabled
 mute_active = False
 
+
+# Initialise root TK
+root = Tk()
 # These next lines define size, position and title of tkinter window
-root.geometry('1400x740+10+10')  # width x height + xpos + ypos
+root.geometry('1400x740+10+10')
+# Title of Tkinter Window
 root.title("Cube Solver")
 
-# Frame and its contents
+# Main frame with buttons & content on.
 mainFrame = Frame(root, width=200, height=200)
 mainFrame.grid(row=0, column=0, padx=10, pady=2)
-
-cubeCanvas = Canvas(mainFrame, width=1000, height=720, bg='black',  bd=0, highlightthickness=0, borderwidth=0,highlightbackground="#232323" )
+# Setting up canvas for digital cube to be printed on
+cubeCanvas = Canvas(mainFrame, width=1000, height=720, bg='black',  bd=0, highlightthickness=0,
+                    borderwidth=0, highlightbackground="#232323")
 cubeCanvas.grid(row=0, column=0, padx=0, pady=0)
 
-current_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
 
+##########################################################################################
+# Open Quickstart
+##########################################################################################
+def openQuickStart():
+    quickStart = Toplevel(root)
 
-def checkSolvable(cube_string):
-    cube_colors = ["O", "W", "R", "G", "B", "Y"]
-    color_count = []
-    for i in range(len(cube_colors)):
-        color_count.append(str(cube_string.count(cube_colors[i])))
-    if all(x==color_count[0] for x in color_count):
-        print("All Colors Have 9")
-        return True
-    else:
-        print(color_count)
-        return False
-
-
-def colourFromLetter(value):
-    try:
-        colors = {'G': 'green', 'R': 'red', 'B': 'blue', 'O': 'orange', 'W': 'White', 'Y': 'Yellow'}
-        return colors[value]
-    except:
-        messagebox.showinfo("Say Hello", "Hello World")
-        return None
-
-
-# Updates cube colours from c
-def updateCubeColours():
-    # Green Face (Layer 1)
-    cubeCanvas.itemconfigure(green_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[0]))
-    cubeCanvas.itemconfigure(green_01, fill=colourFromLetter(current_cube.get_piece(-1, 1, 0).colors[0]))
-    cubeCanvas.itemconfigure(green_02, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[0]))
-    # Green Face (Layer 2)
-    cubeCanvas.itemconfigure(green_10, fill=colourFromLetter(current_cube.get_piece(-1, 0, -1).colors[0]))
-    cubeCanvas.itemconfigure(green_11, fill=colourFromLetter(current_cube.get_piece(-1, 0, 0).colors[0]))
-    cubeCanvas.itemconfigure(green_12, fill=colourFromLetter(current_cube.get_piece(-1, 0, 1).colors[0]))
-    # Green Face (Layer 3)
-    cubeCanvas.itemconfigure(green_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[0]))
-    cubeCanvas.itemconfigure(green_21, fill=colourFromLetter(current_cube.get_piece(-1, -1, 0).colors[0]))
-    cubeCanvas.itemconfigure(green_22, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[0]))
-
-    # White Face (Layer 1)
-    cubeCanvas.itemconfigure(white_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_01, fill=colourFromLetter(current_cube.get_piece(0, 1, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_02, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[2]))
-    # White Face (Layer 2)
-    cubeCanvas.itemconfigure(white_10, fill=colourFromLetter(current_cube.get_piece(-1, 0, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_11, fill=colourFromLetter(current_cube.get_piece(0, 0, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_12, fill=colourFromLetter(current_cube.get_piece(1, 0, 1).colors[2]))
-    # White Face (Layer 3)
-    cubeCanvas.itemconfigure(white_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_21, fill=colourFromLetter(current_cube.get_piece(0, -1, 1).colors[2]))
-    cubeCanvas.itemconfigure(white_22, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[2]))
-
-    # Orange Face (Layer 1)
-    cubeCanvas.itemconfigure(orange_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[1]))
-    cubeCanvas.itemconfigure(orange_01, fill=colourFromLetter(current_cube.get_piece(0, 1, -1).colors[1]))
-    cubeCanvas.itemconfigure(orange_02, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[1]))
-    # Orange Face (Layer 2)
-    cubeCanvas.itemconfigure(orange_10, fill=colourFromLetter(current_cube.get_piece(-1, 1, 0).colors[1]))
-    cubeCanvas.itemconfigure(orange_11, fill=colourFromLetter(current_cube.get_piece(0, 1, 0).colors[1]))
-    cubeCanvas.itemconfigure(orange_12, fill=colourFromLetter(current_cube.get_piece(1, 1, 0).colors[1]))
-    # Orange Face (Layer 3)
-    cubeCanvas.itemconfigure(orange_20, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[1]))
-    cubeCanvas.itemconfigure(orange_21, fill=colourFromLetter(current_cube.get_piece(0, 1, 1).colors[1]))
-    cubeCanvas.itemconfigure(orange_22, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[1]))
-
-    # Red Face (Layer 1)
-    cubeCanvas.itemconfigure(red_00, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[1]))
-    cubeCanvas.itemconfigure(red_01, fill=colourFromLetter(current_cube.get_piece(0, -1, 1).colors[1]))
-    cubeCanvas.itemconfigure(red_02, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[1]))
-    # Red Face (Layer 2)
-    cubeCanvas.itemconfigure(red_10, fill=colourFromLetter(current_cube.get_piece(-1, -1, 0).colors[1]))
-    cubeCanvas.itemconfigure(red_11, fill=colourFromLetter(current_cube.get_piece(0, -1, 0).colors[1]))
-    cubeCanvas.itemconfigure(red_12, fill=colourFromLetter(current_cube.get_piece(1, -1, 0).colors[1]))
-    # Red Face (Layer 3)
-    cubeCanvas.itemconfigure(red_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[1]))
-    cubeCanvas.itemconfigure(red_21, fill=colourFromLetter(current_cube.get_piece(0, -1, -1).colors[1]))
-    cubeCanvas.itemconfigure(red_22, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[1]))
-
-    # Blue Face (Layer 1)
-    cubeCanvas.itemconfigure(blue_00, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[0]))
-    cubeCanvas.itemconfigure(blue_01, fill=colourFromLetter(current_cube.get_piece(1, 1, 0).colors[0]))
-    cubeCanvas.itemconfigure(blue_02, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[0]))
-    # Blue Face (Layer 2)
-    cubeCanvas.itemconfigure(blue_10, fill=colourFromLetter(current_cube.get_piece(1, 0, 1).colors[0]))
-    cubeCanvas.itemconfigure(blue_11, fill=colourFromLetter(current_cube.get_piece(1, 0, 0).colors[0]))
-    cubeCanvas.itemconfigure(blue_12, fill=colourFromLetter(current_cube.get_piece(1, 0, -1).colors[0]))
-    # Blue Face (Layer 3)
-    cubeCanvas.itemconfigure(blue_20, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[0]))
-    cubeCanvas.itemconfigure(blue_21, fill=colourFromLetter(current_cube.get_piece(1, -1, 0).colors[0]))
-    cubeCanvas.itemconfigure(blue_22, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[0]))
-
-    # Yellow Face (Layer 1)
-    cubeCanvas.itemconfigure(yellow_00, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_01, fill=colourFromLetter(current_cube.get_piece(0, 1, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_02, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[2]))
-    # Yellow Face (Layer 2)
-    cubeCanvas.itemconfigure(yellow_10, fill=colourFromLetter(current_cube.get_piece(1, 0, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_11, fill=colourFromLetter(current_cube.get_piece(0, 0, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_12, fill=colourFromLetter(current_cube.get_piece(-1, 0, -1).colors[2]))
-    # Yellow Face (Layer 3)
-    cubeCanvas.itemconfigure(yellow_20, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_21, fill=colourFromLetter(current_cube.get_piece(0, -1, -1).colors[2]))
-    cubeCanvas.itemconfigure(yellow_22, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[2]))
-
-
-def editMode(edit_mode_label, edit_cube_button):
-    global edit_mode, cube_layout, current_cube
-    cubeCanvas.update_idletasks()
-    edit_mode = not edit_mode
-    if edit_mode:
-        print("Entering Edit Mode")
-        edit_cube_button.config(text="Leave Edit Mode")
-        edit_mode_label.place(x=30, y=20)
-        cubeCanvas.itemconfigure(white_color, state='normal')
-        cubeCanvas.itemconfigure(red_color, state='normal')
-        cubeCanvas.itemconfigure(blue_color, state='normal')
-        cubeCanvas.itemconfigure(green_color, state='normal')
-        cubeCanvas.itemconfigure(orange_color, state='normal')
-        cubeCanvas.itemconfigure(yellow_color, state='normal')
-        updateCube(flattenCube())
-    else:
-        print("Leaving Edit mode")
-        edit_cube_button.config(text="Enter Edit Mode")
-        edit_mode_label.place(x=-40, y=-40)
-        cubeCanvas.itemconfigure(white_color, state='hidden')
-        cubeCanvas.itemconfigure(red_color, state='hidden')
-        cubeCanvas.itemconfigure(blue_color, state='hidden')
-        cubeCanvas.itemconfigure(green_color, state='hidden')
-        cubeCanvas.itemconfigure(orange_color, state='hidden')
-        cubeCanvas.itemconfigure(yellow_color, state='hidden')
-        updateCube(flattenCube())
-    return not edit_mode
-
-
-def editColor(event):
-    global current_color, edit_mode
-    if edit_mode:
-        if current_color == " ":
-            current_color = "white"
-
-        # First Stage Decide What Colour Has Been Selected...
-        options = {55: "White", 56: "red", 57: "blue", 58: "orange", 59: "green", 60: "Yellow"}
-        if event.widget.find_withtag("current")[0] in options:
-            current_color = options.get(event.widget.find_withtag("current")[0])
-            print("Current Color = " + str(current_color))
-            # Default To White...
-        else:
-            # # Check the value is not in dict
-            print("You clicked " + str(event))
-            print("Current Color = " + str(current_color))
-            current = event.widget.find_withtag("current")[0]
-            event.widget.itemconfig(current, fill=current_color)
-    else:
-        print("Need to be in edit mode")
-
-
-# Converts Rectangle To Color Letter ("green_00" = "g") For use in cube...
-def convertToLetter(tag):
-    color = cubeCanvas.itemcget(tag, "fill")
-    options = {"red": "R", "White": "W", "Yellow": "Y", "orange": "O", "blue": "B", "green": "G"}
-    return str(options.get(color))
-
-
-# Takes the values from each index and returns a string...
-# This will then be used with the solver.
-def flattenCube():
-    cube_string = ""
-    # First Layer
-    cube_string += str(convertToLetter(orange_00) + convertToLetter(orange_01)+ convertToLetter(orange_02)
-    + convertToLetter(orange_10)+ convertToLetter(orange_11)+  convertToLetter(orange_12) + convertToLetter(orange_20)
-    + convertToLetter(orange_21) + convertToLetter(orange_22))
-
-    # Second Layer
-    cube_string += str(convertToLetter(green_00) + convertToLetter(green_01) + convertToLetter(green_02)
-    + convertToLetter(white_00) + convertToLetter(white_01) + convertToLetter(white_02) + convertToLetter(blue_00)
-    + convertToLetter(blue_01) + convertToLetter(blue_02) + convertToLetter(yellow_00) + convertToLetter(yellow_01)
-    + convertToLetter(yellow_02))
-
-    # Third Layer
-    cube_string += str(convertToLetter(green_10) + convertToLetter(green_11) + convertToLetter(green_12)
-    + convertToLetter(white_10) + convertToLetter(white_11) + convertToLetter(white_12) + convertToLetter(blue_10)
-    + convertToLetter(blue_11) + convertToLetter(blue_12) + convertToLetter(yellow_10) + convertToLetter(yellow_11)
-    + convertToLetter(yellow_12))
-
-    # Fourth Layer
-    cube_string += str(convertToLetter(green_20) + convertToLetter(green_21) + convertToLetter(green_22)
-    + convertToLetter(white_20) + convertToLetter(white_21) + convertToLetter(white_22) + convertToLetter(blue_20)
-    + convertToLetter(blue_21) + convertToLetter(blue_22) + convertToLetter(yellow_20) + convertToLetter(yellow_21)
-    + convertToLetter(yellow_22))
-
-    # Final Layer
-    cube_string += str(convertToLetter(red_00) + convertToLetter(red_01) + convertToLetter(red_02) + convertToLetter(red_10)
-    + convertToLetter(red_11) + convertToLetter(red_12) + convertToLetter(red_20) + convertToLetter(
-        red_21) + convertToLetter(red_22))
-
-    return cube_string
-
-
-# To be used in edit mode - updates cube  with new colors.
-def updateCube(newCubeString):
-    global current_cube
-    current_cube = Cube(newCubeString)
-    updateCubeColours()
-    cubeCanvas.update_idletasks()
-
-def resetCube():
-    updateCube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-    solve_listbox.delete(0,'end')
-
-def printDetails():
-    print(flattenCube())
-    print(current_cube)
-
-
-def performAlgorithm(algo):
-    if edit_mode:
-        messagebox.showinfo("Edit Mode","Please Leave Edit Mode")
-    else:
-        for move in algo.split():
-            try:
-                # Plays Sound If Not muted
-                if mute_active == False:
-                    play()
-                else:
-                    pass
-                print("Move = " + move)
-                print(current_cube)
-                current_cube.sequence(move)
-                cubeCanvas.after(150, updateCubeColours())
-                cubeCanvas.update_idletasks()
-            except:
-                print("Cannot Perform Move '" + move + "'")
-
-
-def notationToMove(move):
-    print("")
-    notation = {
-        "F": "Front Face Right",
-        "Fi": "Front Face Left",
-        "R": "Right Side Up",
-        "Ri": "Right Side Down",
-        "L": "Left Side Down",
-        "Li": "Left Side Up",
-        "U": "Top Layer Left",
-        "Ui": "Top Layer Right",
-        "B": "Back Layer Left",
-        "Bi": "Back Layer Right",
-        "D": "Bottom Layer Right",
-        "Di": "Bottom Layer Left",
-        "M": "Middle Layer Down",
-        "Mi": "Middle Layer Up"
-    }
-    return notation.get(move)
-
-
-def solveCube():
-    global current_cube
-    if edit_mode:
-        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
-    else:
-        new_cube = Cube(flattenCube())
-        cube_str = flattenCube()
-        if new_cube.is_solved():
-            messagebox.showinfo("Cube Solved", "This cube is already solved!")
-        else:
-            if checkSolvable(flattenCube()):
-                solver = SolveCube(new_cube)
-                algo = solver.solveCube()
-                if algo == None:
-                    messagebox.showerror(title="Cube Unsolvable", message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
-                else:
-                    solve_listbox.delete(0, 'end')
-                    performAlgorithm(algo[0])
-                    displaySummary(algo, cube_str)
-                    move_num = 0
-                    for i in algo[0].split():
-                        move_num+= 1
-                        solve_listbox.insert(END, "Move " + str(move_num) + ": " + i)
-            else:
-                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
-
-def stepByStepSolve():
-    global current_cube
-    if edit_mode:
-        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
-    else:
-        new_cube = Cube(flattenCube())
-        cube_str = flattenCube()
-        if new_cube.is_solved():
-            messagebox.showinfo("Cube Solved", "This cube is already solved!")
-        else:
-            if checkSolvable(flattenCube()):
-                solver = SolveCube(new_cube)
-                algo = solver.solveCube()
-                if algo == None:
-                    messagebox.showerror(title="Cube Unsolvable",
-                                         message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
-                else:
-                    solve_listbox.delete(0, 'end')
-                    sbsSolve(algo[0])
-            else:
-                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
-
-
-def scanCube():
-    c = CubeScanner()
-    fullcube = c.scan()
-    if fullcube == None:
-        return None
-    else:
-        print(fullcube)
-        colors = {"White": "W", "Yellow": "Y", "Red": "R", "Green": "G", "Orange": "O", "Blue": "B"}
-        cube_string = ""
-        # Layer 1
-        # Orange Face
-        for val in np.nditer(fullcube[5]):
-            cube_string += colors.get(str(val))
-        # Layer 2 (Top Row From Green-White-Blue-Yellow)
-        for val in np.nditer(fullcube[1][0]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[0][0]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[3][0]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[2][0]):
-            cube_string += colors.get(str(val))
-        # Layer 2 (Middle Row From Green-White-Blue-Yellow)
-        for val in np.nditer(fullcube[1][1]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[0][1]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[3][1]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[2][1]):
-            cube_string += colors.get(str(val))
-        # Layer 3 (Bottom Row From Green-White-Blue-Yellow)
-        for val in np.nditer(fullcube[1][2]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[0][2]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[3][2]):
-            cube_string += colors.get(str(val))
-        for val in np.nditer(fullcube[2][2]):
-            cube_string += colors.get(str(val))
-        # Red Face
-        for val in np.nditer(fullcube[4]):
-            cube_string += colors.get(str(val))
-
-        print("String = " + cube_string)
-        updateCube(cube_string)
-        updateCubeColours()
-
-
-def displaySummary(algo, cube_str):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font('Arial', 'B', 20)
-    pdf.cell(40, 10, 'Rubiks Cube Solve Summary:')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.cell(40, 10, 'Cube String: ' + cube_str)
-    pdf.ln(h='')
-
-    # Start of Summary of Solve
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'White Cross:')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10,'' + str(algo[1][0]))
-    # White Corner
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'White Corners:')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 8, '' + str(algo[1][1]))
-    # Second layer
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'Second Layer (Edge Pieces):')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10, ' ' + str(algo[1][2]))
-    # Yellow Cross
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'Yellow Cross (Oll Look 1):')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10, ' ' + str(algo[1][3]))
-    # OLL
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'OLL Look 2:')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10, ' ' + str(algo[1][4]))
-    # Pll 1
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'Permutate Top Layer (PLL Look 1):')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10, ' ' + str(algo[1][5]))
-    # Solve cube
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'Solve Cube (PLL Look 2):')
-    pdf.ln(h='')
-    pdf.set_font('Arial', 'I', 10)
-    pdf.multi_cell(0, 10, ' ' + str(algo[1][6]))
-
-    # Count Moves -
-    moves = 0
-    for i in algo[0].split():
-        moves += 1
-    pdf.set_font('Arial', 'B', 12)
-    pdf.cell(40, 5, 'Cube Solved In ' + str(moves) + ' Moves.')
-    pdf.ln(h='')
-    pdf.cell(40, 5, "Entire Solve... (In Words)")
-    pdf.ln(h='')
-    for i in algo[0].split():
-        print(notationToMove(i))
-        pdf.cell(0, 10, ''+str(notationToMove(i)), 0, 1)
-
-
-    pdf.output('CubeSolve.pdf', 'F')
-
-
-def generateScramble():
-    notation = [" R ", " U ", " F ", " L ", " B ", "  D ", " Ri ", " Ui ", " Fi ", " Li ", " Bi ", "  Di "]
-    scramble = " "
-    solve_listbox.delete(0, 'end')
-    for i in range(1, 20):
-        current_move = str(notation[random.randrange(0, 12)])
-        scramble += current_move
-        solve_listbox.insert(END, "Move " + str(i) + ": " + current_move)
-    performAlgorithm(scramble)
-
-
-
-
-def sbsSolve(algo):
-    print("Displaying Solve (Step By step)")
-    stepSolve = Toplevel(root)
     # sets the title of the
     # Toplevel widget
-    stepSolve.title("Solving Move.")
+    quickStart.title("Getting Started")
+
     # sets the geometry of toplevel
-    stepSolve.geometry("400x140")
+    quickStart.geometry("800x740")
 
-    # Convert Algorithm to list
-    algo_list = []
-    algo_num = 0
-    algo_num_list = []
-    for i in algo.split():
-        algo_list.append(i)
-        algo_num += 1
-        algo_num_list.append(algo_num)
+    # Declaring notebook
+    my_notebook = ttk.Notebook(quickStart)
+    my_notebook.pack()
 
-    # Convert List to Iterable
-    num_iter = iter(algo_num_list)
-    algo_iter = iter(algo_list)
+    getting_started = Frame(my_notebook, width=800,height=400)
+    getting_started.pack()
 
-    title_label = Label(stepSolve, text="Step by Step Solve")
-    title_label.config(font=("Arial", 20))
-    title_label.place(x=45,y=10)
+    cube_scanner = Frame(my_notebook, width=800,height=400)
+    cube_scanner.pack()
 
-    move = StringVar()
-    move.set("Move: ")
-    move_label = Label(stepSolve, wraplength=200, textvariable=move)
-    move_label.place(x=50, y=50)
+    cube_notation = Frame(my_notebook, width=800,height=400)
+    cube_notation.pack()
 
-    clear_move = StringVar()
-    clear_move.set("Word:")
-    clear_move_label = Label(stepSolve, wraplength=200, textvariable=clear_move)
-    clear_move_label.place(x=50, y=80)
+    drawing_cube = Frame(my_notebook, width=800, height=400)
+    drawing_cube.pack()
 
-    num_move = StringVar()
-    num_move.set("Num: ")
-    num_move_label = Label(stepSolve, wraplength=200, textvariable=num_move)
-    num_move_label.place(x=50, y=110)
+    solving_options = Frame(my_notebook, width=800, height=400)
+    solving_options.pack()
 
-    nextMoveButton = Button(stepSolve, text="Next Move", command=lambda: nextMove(algo_iter, num_iter))
-    nextMoveButton.place(x=290, y=100)
+    my_notebook.add(getting_started, text='Getting Started')
+    my_notebook.add(cube_scanner, text='Scan Your Cube')
+    my_notebook.add(cube_notation, text='Cube Notation')
+    my_notebook.add(drawing_cube, text='Draw Your Cube')
+    my_notebook.add(solving_options, text='Solving Your Cube')
 
-    # Function Hierachy
-    def nextMove(algo_iter, num_iter):
-        try:
-            next_move = next(algo_iter)
-            move_number = next(num_iter)
-            solve_listbox.insert(END, "Move " + str(move_number) + ": " + next_move)
+    # Different Pages
 
-            move.set("Move: " + str(next_move))
-            clear_move.set("Word: " + notationToMove(str(next_move)))
-            num_move.set("Num: " + str(move_number) + " / " + str(len(algo_list)))
-            performAlgorithm(str(next_move))
-        except:
-            move.set("Move: There are no more moves.")
-            clear_move.set("Word: There are no more moves.")
+    # Getting Started:
+    getting_started_title = Label(getting_started, text=" \n Getting Started \n").pack()
+    # Main Text
+    p1 = open("Text/Getting Started/gettingstarted.txt")
+    p1_content = p1.read()
+    para1 = Label(getting_started, text=p1_content).pack()
+    # Image
+    main_app_image = PhotoImage(file='Images/Getting Started Images/Getting Started/main_app_photo.gif')
+    image_label = Label(getting_started, image=main_app_image)
+    image_label.photo = main_app_image
+    image_label.pack()
 
+    # Scanning Your Cube
+    cube_scanner_title = Label(cube_scanner, text="\n Scanning Your Own Cube \n ").pack()
+    scanner_p1 = open("Text/Scan Your Cube/scanningcube.txt")
+    scanner_p1_content = scanner_p1.read()
+    Label(cube_scanner, text=scanner_p1_content).pack()
+
+    cube_scanner_image = PhotoImage(file="Images/Getting Started Images/Cube Scanner/cube_scanner__image.gif")
+    scanner_image_label = Label(cube_scanner, image=cube_scanner_image)
+    scanner_image_label.photo = cube_scanner_image
+    scanner_image_label.pack()
+
+
+    # Cube Notation1400
+    cube_notation_title = Label(cube_notation, text="\n Cube Notation\n ").pack()
+    notation_p1 = open("Text/Cube Notation/cubenotation.txt")
+    notation_p1_content = notation_p1.read()
+    Label(cube_notation, text=notation_p1_content).pack()
+
+    # Images
+    cube_notation_images = PhotoImage(file="Images/Getting Started Images/Notation/cube_notation_image.gif")
+    cube_notation_image_label = Label(cube_notation, image=cube_notation_images)
+    cube_notation_image_label.photo = cube_notation_images
+    cube_notation_image_label.pack()
+
+    # Para 2
+    notation_p2 = open("Text/Cube Notation/cubenotation_para2.txt")
+    notation_p2_content = notation_p2.read()
+    Label(cube_notation, text=notation_p2_content).pack()
+
+
+    # Drawing Your Cube
+    drawing_cube_title = Label(drawing_cube, text="\n Drawing Your Cube Digitally\n ").pack()
+    edit_cube_image = PhotoImage(file="Images/Getting Started Images/Edit Cube/draw_cube.gif")
+    edit_cube_image_label = Label(drawing_cube, image=edit_cube_image)
+    edit_cube_image_label.photo = edit_cube_image
+    edit_cube_image_label.pack()
+
+    drawing_cube_p1 = open("Text/Drawing Your Cube/drawingcube.txt")
+    drawing_cube_p1_content = drawing_cube_p1.read()
+    Label(drawing_cube, text=drawing_cube_p1_content).pack()
+
+
+    # Solving Your Cube
+    solving_options_title = Label(solving_options, text="\n Solving Your Cube\n ").pack()
+
+    solving_cube_p1 = open("Text/Solving/solving.txt")
+    solving_cube_p1_content = solving_cube_p1.read()
+    Label(solving_options, text=solving_cube_p1_content).pack()
+
+    solving_cube_image = PhotoImage(file="Images/Getting Started Images/Solving Cube/step-by-step.gif")
+    solving_cube_image_label = Label(solving_options, image=solving_cube_image)
+    solving_cube_image_label.photo = solving_cube_image
+    solving_cube_image_label.pack()
+
+    solving_cube_p2 = open("Text/Solving/solving_para2.txt")
+    solving_cube_p2_content = solving_cube_p2.read()
+    Label(solving_options, text=solving_cube_p2_content).pack()
+
+    solving_cube_image2 = PhotoImage(file="Images/Getting Started Images/Solving Cube/full_solve.gif")
+    solving_cube_image_label2 = Label(solving_options, image=solving_cube_image2)
+    solving_cube_image_label2.photo = solving_cube_image2
+    solving_cube_image_label2.pack()
+
+    quickStart.resizable(False, False)
+
+
+##########################################################################################
+# Settings
+##########################################################################################
 def mute():
     global mute_active
     mute_active = True
 
-def unmute():
+
+def unMute():
     global mute_active
     mute_active = False
 
 
-# Open Settings
 def openSettings():
     global settings_open
 
@@ -592,7 +221,7 @@ def openSettings():
     mute_button.config(font=("Arial", 15))
     mute_button.place(x=85, y=220)
 
-    unmute_button = btn(settings_canvas, text="Unmute Sound", command= lambda: unmute(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+    unmute_button = btn(settings_canvas, text="Unmute Sound", command= lambda: unMute(), bg="#EEEEEE", fg="#000", highlightbackground="white")
     unmute_button.config(font=("Arial", 15))
     unmute_button.place(x=200, y=220)
 
@@ -717,129 +346,488 @@ def openSettings():
 
     newWindow.grab_set()
 
-# Open Quickstart
-def openQuickStart():
-    quickStart = Toplevel(root)
 
+##########################################################################################
+# Scan Your Own Cube
+##########################################################################################
+def scanCube():
+    c = CubeScanner()
+    fullcube = c.scan()
+    if fullcube == None:
+        return None
+    else:
+        print(fullcube)
+        colors = {"White": "W", "Yellow": "Y", "Red": "R", "Green": "G", "Orange": "O", "Blue": "B"}
+        cube_string = ""
+        # Layer 1
+        # Orange Face
+        for val in np.nditer(fullcube[5]):
+            cube_string += colors.get(str(val))
+        # Layer 2 (Top Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][0]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][0]):
+            cube_string += colors.get(str(val))
+        # Layer 2 (Middle Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][1]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][1]):
+            cube_string += colors.get(str(val))
+        # Layer 3 (Bottom Row From Green-White-Blue-Yellow)
+        for val in np.nditer(fullcube[1][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[0][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[3][2]):
+            cube_string += colors.get(str(val))
+        for val in np.nditer(fullcube[2][2]):
+            cube_string += colors.get(str(val))
+        # Red Face
+        for val in np.nditer(fullcube[4]):
+            cube_string += colors.get(str(val))
+
+        print("String = " + cube_string)
+        updateCube(cube_string)
+        updateCubeColours()
+
+
+##########################################################################################
+# Making Moves On The Cube and Updating the Canvas
+##########################################################################################
+# Takes the values from each index and returns a string...
+# This will then be used with the solver.
+def flattenCube():
+    cube_string = ""
+    # First Layer
+    cube_string += str(letterFromColour(orange_00) + letterFromColour(orange_01) + letterFromColour(orange_02)
+                       + letterFromColour(orange_10) + letterFromColour(orange_11) + letterFromColour(orange_12) + letterFromColour(orange_20)
+                       + letterFromColour(orange_21) + letterFromColour(orange_22))
+
+    # Second Layer
+    cube_string += str(letterFromColour(green_00) + letterFromColour(green_01) + letterFromColour(green_02)
+                       + letterFromColour(white_00) + letterFromColour(white_01) + letterFromColour(white_02) + letterFromColour(blue_00)
+                       + letterFromColour(blue_01) + letterFromColour(blue_02) + letterFromColour(yellow_00) + letterFromColour(yellow_01)
+                       + letterFromColour(yellow_02))
+
+    # Third Layer
+    cube_string += str(letterFromColour(green_10) + letterFromColour(green_11) + letterFromColour(green_12)
+                       + letterFromColour(white_10) + letterFromColour(white_11) + letterFromColour(white_12) + letterFromColour(blue_10)
+                       + letterFromColour(blue_11) + letterFromColour(blue_12) + letterFromColour(yellow_10) + letterFromColour(yellow_11)
+                       + letterFromColour(yellow_12))
+
+    # Fourth Layer
+    cube_string += str(letterFromColour(green_20) + letterFromColour(green_21) + letterFromColour(green_22)
+                       + letterFromColour(white_20) + letterFromColour(white_21) + letterFromColour(white_22) + letterFromColour(blue_20)
+                       + letterFromColour(blue_21) + letterFromColour(blue_22) + letterFromColour(yellow_20) + letterFromColour(yellow_21)
+                       + letterFromColour(yellow_22))
+
+    # Final Layer
+    cube_string += str(letterFromColour(red_00) + letterFromColour(red_01) + letterFromColour(red_02) + letterFromColour(red_10)
+                       + letterFromColour(red_11) + letterFromColour(red_12) + letterFromColour(red_20) + letterFromColour(
+        red_21) + letterFromColour(red_22))
+
+    return cube_string
+
+
+# Takes a letter from current_cube e.g. 'o' and coverts to Orange
+# Usage is for converting rectangle to same colour as current_cube
+def colourFromLetter(value):
+    try:
+        colors = {'G': 'green', 'R': 'red', 'B': 'blue', 'O': 'orange', 'W': 'White', 'Y': 'Yellow'}
+        return colors[value]
+    except:
+        messagebox.showinfo("Error", "There was an error converting the notation")
+        return None
+
+
+# Converts Rectangle To Color Letter (uses tag)
+# For example, to be used as green_00's colour = 'g'
+def letterFromColour(tag):
+    color = cubeCanvas.itemcget(tag, "fill")
+    options = {"red": "R", "White": "W", "Yellow": "Y", "orange": "O", "blue": "B", "green": "G"}
+    return str(options.get(color))
+
+
+# Updates cube colours from current_cube
+def updateCubeColours():
+    # Green Face (Layer 1)
+    cubeCanvas.itemconfigure(green_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[0]))
+    cubeCanvas.itemconfigure(green_01, fill=colourFromLetter(current_cube.get_piece(-1, 1, 0).colors[0]))
+    cubeCanvas.itemconfigure(green_02, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[0]))
+    # Green Face (Layer 2)
+    cubeCanvas.itemconfigure(green_10, fill=colourFromLetter(current_cube.get_piece(-1, 0, -1).colors[0]))
+    cubeCanvas.itemconfigure(green_11, fill=colourFromLetter(current_cube.get_piece(-1, 0, 0).colors[0]))
+    cubeCanvas.itemconfigure(green_12, fill=colourFromLetter(current_cube.get_piece(-1, 0, 1).colors[0]))
+    # Green Face (Layer 3)
+    cubeCanvas.itemconfigure(green_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[0]))
+    cubeCanvas.itemconfigure(green_21, fill=colourFromLetter(current_cube.get_piece(-1, -1, 0).colors[0]))
+    cubeCanvas.itemconfigure(green_22, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[0]))
+
+    # White Face (Layer 1)
+    cubeCanvas.itemconfigure(white_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_01, fill=colourFromLetter(current_cube.get_piece(0, 1, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_02, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[2]))
+    # White Face (Layer 2)
+    cubeCanvas.itemconfigure(white_10, fill=colourFromLetter(current_cube.get_piece(-1, 0, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_11, fill=colourFromLetter(current_cube.get_piece(0, 0, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_12, fill=colourFromLetter(current_cube.get_piece(1, 0, 1).colors[2]))
+    # White Face (Layer 3)
+    cubeCanvas.itemconfigure(white_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_21, fill=colourFromLetter(current_cube.get_piece(0, -1, 1).colors[2]))
+    cubeCanvas.itemconfigure(white_22, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[2]))
+
+    # Orange Face (Layer 1)
+    cubeCanvas.itemconfigure(orange_00, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[1]))
+    cubeCanvas.itemconfigure(orange_01, fill=colourFromLetter(current_cube.get_piece(0, 1, -1).colors[1]))
+    cubeCanvas.itemconfigure(orange_02, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[1]))
+    # Orange Face (Layer 2)
+    cubeCanvas.itemconfigure(orange_10, fill=colourFromLetter(current_cube.get_piece(-1, 1, 0).colors[1]))
+    cubeCanvas.itemconfigure(orange_11, fill=colourFromLetter(current_cube.get_piece(0, 1, 0).colors[1]))
+    cubeCanvas.itemconfigure(orange_12, fill=colourFromLetter(current_cube.get_piece(1, 1, 0).colors[1]))
+    # Orange Face (Layer 3)
+    cubeCanvas.itemconfigure(orange_20, fill=colourFromLetter(current_cube.get_piece(-1, 1, 1).colors[1]))
+    cubeCanvas.itemconfigure(orange_21, fill=colourFromLetter(current_cube.get_piece(0, 1, 1).colors[1]))
+    cubeCanvas.itemconfigure(orange_22, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[1]))
+
+    # Red Face (Layer 1)
+    cubeCanvas.itemconfigure(red_00, fill=colourFromLetter(current_cube.get_piece(-1, -1, 1).colors[1]))
+    cubeCanvas.itemconfigure(red_01, fill=colourFromLetter(current_cube.get_piece(0, -1, 1).colors[1]))
+    cubeCanvas.itemconfigure(red_02, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[1]))
+    # Red Face (Layer 2)
+    cubeCanvas.itemconfigure(red_10, fill=colourFromLetter(current_cube.get_piece(-1, -1, 0).colors[1]))
+    cubeCanvas.itemconfigure(red_11, fill=colourFromLetter(current_cube.get_piece(0, -1, 0).colors[1]))
+    cubeCanvas.itemconfigure(red_12, fill=colourFromLetter(current_cube.get_piece(1, -1, 0).colors[1]))
+    # Red Face (Layer 3)
+    cubeCanvas.itemconfigure(red_20, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[1]))
+    cubeCanvas.itemconfigure(red_21, fill=colourFromLetter(current_cube.get_piece(0, -1, -1).colors[1]))
+    cubeCanvas.itemconfigure(red_22, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[1]))
+
+    # Blue Face (Layer 1)
+    cubeCanvas.itemconfigure(blue_00, fill=colourFromLetter(current_cube.get_piece(1, 1, 1).colors[0]))
+    cubeCanvas.itemconfigure(blue_01, fill=colourFromLetter(current_cube.get_piece(1, 1, 0).colors[0]))
+    cubeCanvas.itemconfigure(blue_02, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[0]))
+    # Blue Face (Layer 2)
+    cubeCanvas.itemconfigure(blue_10, fill=colourFromLetter(current_cube.get_piece(1, 0, 1).colors[0]))
+    cubeCanvas.itemconfigure(blue_11, fill=colourFromLetter(current_cube.get_piece(1, 0, 0).colors[0]))
+    cubeCanvas.itemconfigure(blue_12, fill=colourFromLetter(current_cube.get_piece(1, 0, -1).colors[0]))
+    # Blue Face (Layer 3)
+    cubeCanvas.itemconfigure(blue_20, fill=colourFromLetter(current_cube.get_piece(1, -1, 1).colors[0]))
+    cubeCanvas.itemconfigure(blue_21, fill=colourFromLetter(current_cube.get_piece(1, -1, 0).colors[0]))
+    cubeCanvas.itemconfigure(blue_22, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[0]))
+
+    # Yellow Face (Layer 1)
+    cubeCanvas.itemconfigure(yellow_00, fill=colourFromLetter(current_cube.get_piece(1, 1, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_01, fill=colourFromLetter(current_cube.get_piece(0, 1, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_02, fill=colourFromLetter(current_cube.get_piece(-1, 1, -1).colors[2]))
+    # Yellow Face (Layer 2)
+    cubeCanvas.itemconfigure(yellow_10, fill=colourFromLetter(current_cube.get_piece(1, 0, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_11, fill=colourFromLetter(current_cube.get_piece(0, 0, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_12, fill=colourFromLetter(current_cube.get_piece(-1, 0, -1).colors[2]))
+    # Yellow Face (Layer 3)
+    cubeCanvas.itemconfigure(yellow_20, fill=colourFromLetter(current_cube.get_piece(1, -1, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_21, fill=colourFromLetter(current_cube.get_piece(0, -1, -1).colors[2]))
+    cubeCanvas.itemconfigure(yellow_22, fill=colourFromLetter(current_cube.get_piece(-1, -1, -1).colors[2]))
+
+
+# Plays a random cube sound
+def play():
+    file_num = random.randrange(1,12)
+    file = ("SoundEffects/Cube Moves/move_"+ str(file_num)+".mp3")
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play(loops=0)
+
+
+# Given a string of notation, will perform a each move on the cube
+def performAlgorithm(algo):
+    approved_moves = ["F", "Fi", "R", "Ri", "L", "Li", "U", "Ui", "B", "Bi", "D", "Di", "M", "Mi"]
+
+    if edit_mode:
+        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
+    else:
+        # Split the algorithm into moves
+        for move in algo.split():
+            try:
+                # Check if the move can be done (list of approved moves)
+                if move in approved_moves:
+                    # Plays Sound if Not muted
+                    if not mute_active:
+                        play()
+                    else:
+                        pass
+                    # Make a move on current_cube
+                    current_cube.sequence(move)
+                    # Update the cube colours to make changes to digital cube
+                    cubeCanvas.after(150, updateCubeColours())
+                    # Update canvas to show user the changes
+                    cubeCanvas.update_idletasks()
+                # If move cannot be done (is not in approved moves)
+                elif move not in approved_moves:
+                    # Show an error
+                    messagebox.showerror("Move Not Allowed", "Cannot make move " + str(move))
+            except:
+                # Print an error if anything goes wrong
+                messagebox.showerror("Move Error", "Cannot make move " + str(move))
+
+
+def generateScramble():
+    notation = [" R ", " U ", " F ", " L ", " B ", " D ", " Ri ", " Ui ", " Fi ", " Li ", " Bi ", " Di "]
+    scramble = " "
+    solve_listbox.delete(0, 'end')
+    for i in range(0, 30):
+        current_move = str(notation[random.randrange(0, 12)])
+        print(current_move)
+        scramble += current_move
+        solve_listbox.insert(END, "Move " + str(i + 1) + ": " + current_move)
+    performAlgorithm(scramble)
+
+
+##########################################################################################
+# Editing Current Cube
+##########################################################################################
+# Updates cube  with new colors - to be used in editMode
+def updateCube(newCubeString):
+    global current_cube
+    current_cube = Cube(newCubeString)
+    updateCubeColours()
+    cubeCanvas.update_idletasks()
+
+
+def editMode(edit_mode_label, edit_cube_button):
+    global edit_mode, cube_layout, current_cube
+    # Update Cube Canvas whenever edit mode is clicked
+    cubeCanvas.update_idletasks()
+    # When edit mode is clicked, inverse the global edit_mode boolean
+    edit_mode = not edit_mode
+
+    if edit_mode:
+        # User is entering edit mode
+        # Change button text to Leave Edit Mode
+        edit_cube_button.config(text="Leave Edit Mode")
+        # Place 'Edit Mode' on top left of screen
+        edit_mode_label.place(x=30, y=20)
+        # Reveal all colours for users to click on
+        cubeCanvas.itemconfigure(white_color, state='normal')
+        cubeCanvas.itemconfigure(red_color, state='normal')
+        cubeCanvas.itemconfigure(blue_color, state='normal')
+        cubeCanvas.itemconfigure(green_color, state='normal')
+        cubeCanvas.itemconfigure(orange_color, state='normal')
+        cubeCanvas.itemconfigure(yellow_color, state='normal')
+        # Update the cube string after edit mode
+        updateCube(flattenCube())
+    else:
+        print("Leaving Edit mode")
+        edit_cube_button.config(text="Enter Edit Mode")
+        edit_mode_label.place(x=-40, y=-40)
+        cubeCanvas.itemconfigure(white_color, state='hidden')
+        cubeCanvas.itemconfigure(red_color, state='hidden')
+        cubeCanvas.itemconfigure(blue_color, state='hidden')
+        cubeCanvas.itemconfigure(green_color, state='hidden')
+        cubeCanvas.itemconfigure(orange_color, state='hidden')
+        cubeCanvas.itemconfigure(yellow_color, state='hidden')
+        updateCube(flattenCube())
+    return not edit_mode
+
+
+def editColor(event):
+    global current_color, edit_mode
+    if edit_mode:
+        if current_color == " ":
+            current_color = "white"
+
+        # First Stage Decide What Colour Has Been Selected...
+        options = {55: "White", 56: "red", 57: "blue", 58: "orange", 59: "green", 60: "Yellow"}
+        if event.widget.find_withtag("current")[0] in options:
+            current_color = options.get(event.widget.find_withtag("current")[0])
+            print("Current Color = " + str(current_color))
+            # Default To White...
+        else:
+            # # Check the value is not in dict
+            print("You clicked " + str(event))
+            print("Current Color = " + str(current_color))
+            current = event.widget.find_withtag("current")[0]
+            event.widget.itemconfig(current, fill=current_color)
+    else:
+        # Do nothing...
+        pass
+
+
+##########################################################################################
+# Solving Algorithm (Full and Step-By-Step)
+##########################################################################################
+# Converts Notation to Words for better understanding (step by step solve)
+def notationToMove(move):
+    print("")
+    notation = {
+        "F": "Front Face Right",
+        "Fi": "Front Face Left",
+        "R": "Right Side Up",
+        "Ri": "Right Side Down",
+        "L": "Left Side Down",
+        "Li": "Left Side Up",
+        "U": "Top Layer Left",
+        "Ui": "Top Layer Right",
+        "B": "Back Layer Left",
+        "Bi": "Back Layer Right",
+        "D": "Bottom Layer Right",
+        "Di": "Bottom Layer Left",
+        "M": "Middle Layer Down",
+        "Mi": "Middle Layer Up"
+    }
+    return notation.get(move)
+
+
+def checkSolvable(cube_string):
+    cube_colors = ["O", "W", "R", "G", "B", "Y"]
+    color_count = []
+    for i in range(len(cube_colors)):
+        color_count.append(str(cube_string.count(cube_colors[i])))
+    if all(x==color_count[0] for x in color_count):
+        print("All Colors Have 9")
+        return True
+    else:
+        print(color_count)
+        return False
+
+
+def solveCube():
+    global current_cube
+    if edit_mode:
+        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
+    else:
+        new_cube = Cube(flattenCube())
+        cube_str = flattenCube()
+        if new_cube.is_solved():
+            messagebox.showinfo("Cube Solved", "This cube is already solved!")
+        else:
+            if checkSolvable(flattenCube()):
+                solver = SolveCube(new_cube)
+                algo = solver.solveCube()
+                if algo == None:
+                    messagebox.showerror(title="Cube Unsolvable", message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
+                else:
+                    solve_listbox.delete(0, 'end')
+                    performAlgorithm(algo[0])
+                    move_num = 0
+                    for i in algo[0].split():
+                        move_num+= 1
+                        solve_listbox.insert(END, "Move " + str(move_num) + ": " + i)
+            else:
+                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
+
+
+# Controls button press for step by step solve
+def stepByStepSolve():
+    global current_cube
+    if edit_mode:
+        messagebox.showinfo("Edit Mode", "Please Leave Edit Mode")
+    else:
+        new_cube = Cube(flattenCube())
+        cube_str = flattenCube()
+        if new_cube.is_solved():
+            messagebox.showinfo("Cube Solved", "This cube is already solved!")
+        else:
+            if checkSolvable(flattenCube()):
+                solver = SolveCube(new_cube)
+                algo = solver.solveCube()
+                if algo == None:
+                    messagebox.showerror(title="Cube Unsolvable",
+                                         message="This cube cannot be solved, - Please double check your cube / the digital on-screen cube")
+                else:
+                    solve_listbox.delete(0, 'end')
+                    sbsSolve(algo[0])
+            else:
+                messagebox.showerror("Cube Unsolvable", "Please ensure there are 9 of each colour on the cube.")
+
+
+# Displays UI for step by step solve
+def sbsSolve(algo):
+    print("Displaying Solve (Step By step)")
+    stepSolve = Toplevel(root)
     # sets the title of the
     # Toplevel widget
-    quickStart.title("Getting Started")
-
+    stepSolve.title("Solving Move.")
     # sets the geometry of toplevel
-    quickStart.geometry("800x740")
+    stepSolve.geometry("400x140")
 
-    # Declaring notebook
-    my_notebook = ttk.Notebook(quickStart)
-    my_notebook.pack()
+    # Convert Algorithm to list
+    algo_list = []
+    algo_num = 0
+    algo_num_list = []
+    for i in algo.split():
+        algo_list.append(i)
+        algo_num += 1
+        algo_num_list.append(algo_num)
 
-    getting_started = Frame(my_notebook, width=800,height=400)
-    getting_started.pack()
+    # Convert List to Iterable
+    num_iter = iter(algo_num_list)
+    algo_iter = iter(algo_list)
 
-    cube_scanner = Frame(my_notebook, width=800,height=400)
-    cube_scanner.pack()
+    title_label = Label(stepSolve, text="Step by Step Solve")
+    title_label.config(font=("Arial", 20))
+    title_label.place(x=45,y=10)
 
-    cube_notation = Frame(my_notebook, width=800,height=400)
-    cube_notation.pack()
+    move = StringVar()
+    move.set("Move: ")
+    move_label = Label(stepSolve, wraplength=200, textvariable=move)
+    move_label.place(x=50, y=50)
 
-    drawing_cube = Frame(my_notebook, width=800, height=400)
-    drawing_cube.pack()
+    clear_move = StringVar()
+    clear_move.set("Word:")
+    clear_move_label = Label(stepSolve, wraplength=200, textvariable=clear_move)
+    clear_move_label.place(x=50, y=80)
 
-    solving_options = Frame(my_notebook, width=800, height=400)
-    solving_options.pack()
+    num_move = StringVar()
+    num_move.set("Num: ")
+    num_move_label = Label(stepSolve, wraplength=200, textvariable=num_move)
+    num_move_label.place(x=50, y=110)
 
-    my_notebook.add(getting_started, text='Getting Started')
-    my_notebook.add(cube_scanner, text='Scan Your Cube')
-    my_notebook.add(cube_notation, text='Cube Notation')
-    my_notebook.add(drawing_cube, text='Draw Your Cube')
-    my_notebook.add(solving_options, text='Solving Your Cube')
+    nextMoveButton = Button(stepSolve, text="Next Move", command=lambda: nextMove(algo_iter, num_iter))
+    nextMoveButton.place(x=290, y=100)
 
-    # Different Pages
+    # Function Hierachy
+    def nextMove(algo_iter, num_iter):
+        try:
+            next_move = next(algo_iter)
+            move_number = next(num_iter)
+            solve_listbox.insert(END, "Move " + str(move_number) + ": " + next_move)
 
-    # Getting Started:
-    getting_started_title = Label(getting_started, text=" \n Getting Started \n").pack()
-    # Main Text
-    p1 = open("Text/Getting Started/gettingstarted.txt")
-    p1_content = p1.read()
-    para1 = Label(getting_started, text=p1_content).pack()
-    # Image
-    main_app_image = PhotoImage(file='Images/Getting Started Images/Getting Started/main_app_photo.gif')
-    image_label = Label(getting_started, image=main_app_image)
-    image_label.photo = main_app_image
-    image_label.pack()
-
-    # Scanning Your Cube
-    cube_scanner_title = Label(cube_scanner, text="\n Scanning Your Own Cube \n ").pack()
-    scanner_p1 = open("Text/Scan Your Cube/scanningcube.txt")
-    scanner_p1_content = scanner_p1.read()
-    Label(cube_scanner, text=scanner_p1_content).pack()
-
-    cube_scanner_image = PhotoImage(file="Images/Getting Started Images/Cube Scanner/cube_scanner__image.gif")
-    scanner_image_label = Label(cube_scanner, image=cube_scanner_image)
-    scanner_image_label.photo = cube_scanner_image
-    scanner_image_label.pack()
-
-
-    # Cube Notation1400
-    cube_notation_title = Label(cube_notation, text="\n Cube Notation\n ").pack()
-    notation_p1 = open("Text/Cube Notation/cubenotation.txt")
-    notation_p1_content = notation_p1.read()
-    Label(cube_notation, text=notation_p1_content).pack()
-
-    # Images
-    cube_notation_images = PhotoImage(file="Images/Getting Started Images/Notation/cube_notation_image.gif")
-    cube_notation_image_label = Label(cube_notation, image=cube_notation_images)
-    cube_notation_image_label.photo = cube_notation_images
-    cube_notation_image_label.pack()
-
-    # Para 2
-    notation_p2 = open("Text/Cube Notation/cubenotation_para2.txt")
-    notation_p2_content = notation_p2.read()
-    Label(cube_notation, text=notation_p2_content).pack()
+            move.set("Move: " + str(next_move))
+            clear_move.set("Word: " + notationToMove(str(next_move)))
+            num_move.set("Num: " + str(move_number) + " / " + str(len(algo_list)))
+            performAlgorithm(str(next_move))
+        except:
+            move.set("Move: There are no more moves.")
+            clear_move.set("Word: There are no more moves.")
 
 
-    # Drawing Your Cube
-    drawing_cube_title = Label(drawing_cube, text="\n Drawing Your Cube Digitally\n ").pack()
-    edit_cube_image = PhotoImage(file="Images/Getting Started Images/Edit Cube/draw_cube.gif")
-    edit_cube_image_label = Label(drawing_cube, image=edit_cube_image)
-    edit_cube_image_label.photo = edit_cube_image
-    edit_cube_image_label.pack()
-
-    drawing_cube_p1 = open("Text/Drawing Your Cube/drawingcube.txt")
-    drawing_cube_p1_content = drawing_cube_p1.read()
-    Label(drawing_cube, text=drawing_cube_p1_content).pack()
+##########################################################################################
+# Resetting Cube
+##########################################################################################
+def resetCube():
+    # Makes use of the updateCube method, to convert the cube into a solved state
+    updateCube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+    # Clears the solve list box
+    solve_listbox.delete(0, 'end')
 
 
-    # Solving Your Cube
-    solving_options_title = Label(solving_options, text="\n Solving Your Cube\n ").pack()
-
-    solving_cube_p1 = open("Text/Solving/solving.txt")
-    solving_cube_p1_content = solving_cube_p1.read()
-    Label(solving_options, text=solving_cube_p1_content).pack()
-
-    solving_cube_image = PhotoImage(file="Images/Getting Started Images/Solving Cube/step-by-step.gif")
-    solving_cube_image_label = Label(solving_options, image=solving_cube_image)
-    solving_cube_image_label.photo = solving_cube_image
-    solving_cube_image_label.pack()
-
-    solving_cube_p2 = open("Text/Solving/solving_para2.txt")
-    solving_cube_p2_content = solving_cube_p2.read()
-    Label(solving_options, text=solving_cube_p2_content).pack()
-
-    solving_cube_image2 = PhotoImage(file="Images/Getting Started Images/Solving Cube/full_solve.gif")
-    solving_cube_image_label2 = Label(solving_options, image=solving_cube_image2)
-    solving_cube_image_label2.photo = solving_cube_image2
-    solving_cube_image_label2.pack()
-
-    quickStart.resizable(False, False)
 
 
+# Declaring individual rectangles for each index on a particular face.
+# Green Face (Layer 1)
 green_00 = cubeCanvas.create_rectangle(20, 240, 90, 310, width=0, fill='green', tag="green_00")
 cubeCanvas.tag_bind("green_00", "<Button-1>", editColor)
 green_01 = cubeCanvas.create_rectangle(100, 240, 170, 310, width=0, fill='green', tag="green_01")
 cubeCanvas.tag_bind("green_01", "<Button-1>", editColor)
 green_02 = cubeCanvas.create_rectangle(180, 240, 250, 310, width=0, fill='green', tag="green_02")
 cubeCanvas.tag_bind("green_02", "<Button-1>", editColor)
-
 # Green Face (Layer 2)
 green_10 = cubeCanvas.create_rectangle(20, 320, 90, 390, width=0, fill='green', tag="green_10")
 cubeCanvas.tag_bind("green_10", "<Button-1>", editColor)
@@ -992,7 +980,8 @@ quickStartButton.config(font=("Arial", 15))
 quickStartButton.place(x=1100, y=100)
 
 # Settings Button
-settingsButton = btn(root, text="Settings", command=lambda: openSettings(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
+settingsButton = btn(root, text="Settings", command=lambda: print("Open Settings Clicked"), bg="#EEEEEE", fg="#000",
+                     highlightbackground="white")
 settingsButton.config(font=("Arial", 15))
 settingsButton.place(x=1230, y=100)
 
@@ -1028,6 +1017,8 @@ move_title.place(x=1110, y=230)
 # Move Input
 moveInput = Entry(root)
 moveInput.place(x=1125, y=260)
+
+# Buttons for move input, and random scramble generator.
 moveInputButton = btn(root, text="Make Move", command=lambda: performAlgorithm(moveInput.get()),bg="#EEEEEE", fg="#000",highlightbackground="white" )
 moveInputButton.place(x=1160, y=290)
 randomScrambleButton = btn(root, text="Random Scramble", command=lambda: generateScramble(),bg="#EEEEEE", fg="#000",highlightbackground="white" )
@@ -1056,9 +1047,9 @@ solve_text.set("Your Solving Algorithm Will Appear Here")
 scramble_label = Label(root, wraplength=200, textvariable=solve_text)
 scramble_label.place(x=1130, y=420)
 
-
+# Listbox to display solving algorithm
 solve_listbox = Listbox(root)
-solve_listbox.place(x=1137,y=480)
+solve_listbox.place(x=1137, y=480)
 
 
 

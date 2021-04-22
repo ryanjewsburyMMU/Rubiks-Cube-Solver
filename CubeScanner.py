@@ -106,7 +106,7 @@ class CubeScanner():
         while True:
             ret, frame = cap.read()
             # Flip Camera??
-            # frame = cv2.flip(frame, 1)
+            frame = cv2.flip(frame, 1)
 
             text_size = cv2.getTextSize(text, font, 1, 2)[0]
             # Main Instructions Text

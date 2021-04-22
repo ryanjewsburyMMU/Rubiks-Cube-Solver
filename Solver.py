@@ -1112,83 +1112,51 @@ class SolveCube:
 
             # No Line Found
             else:
-                # No Line Found (Hard coded case 'H')
+                # Rotating cube until we line up the sides, ready to check for a 'H'
+                # So long as orange is not lined up with the orange face (-1,1,-1)
+                # We can check for the 'H' shape
                 while self.c.get_piece(-1, 1, -1).colors[1] != "O":
                     self.c.sequence("B")
                     final_edge_algorithm += " B"
+                # Now checking for the 'H' case on the cube
                 if (self.c.get_piece(0, 1, -1).colors[1] == self.c.get_piece(0, -1, 0).colors[1] and
                         self.c.get_piece(0, -1, -1).colors[1] == self.c.get_piece(0, 1, 0).colors[1] and
                         self.c.get_piece(-1, 0, -1).colors[0] == self.c.get_piece(1, 0, 0).colors[0] and
                         self.c.get_piece(1, 0, -1).colors[0] == self.c.get_piece(-1, 0, 0).colors[0]):
+                    # If 'H' case is found, perform the following algorithm
                     self.c.sequence("M M Bi M M B B M M Bi M M")
+                    # Append the moves to the final algorithm
                     final_edge_algorithm += " M M Bi M M B B M M Bi M M"
                 else:
+                    # If 'H' not found, the case must be a 'Z' case - therefore perform the following
+                    # Algorithm
                     self.c.sequence("Mi Bi M M Bi M M Bi Mi B B M M")
+                    # Append moves to final edge algorithm
                     final_edge_algorithm += " Mi Bi M M Bi M M Bi Mi B B M M"
                     while self.c.get_piece(-1, 1, -1).colors[1] != self.c.get_piece(0, 1, -1).colors[1]:
                         self.c.sequence("Mi Bi M M Bi M M Bi Mi B B M M")
+                        # Append the moves to the final algorithm
                         final_edge_algorithm += " Mi Bi M M Bi M M Bi Mi B B M M"
-
-                    if self.c.is_solved() == False:
-                        print("cube not solved")
-                        while self.c.is_solved() == False:
+                    # Final Checks if solved, but not aligned
+                    if not self.c.is_solved():
+                        # Rotate the cube until it is aligned, and solved.
+                        while not self.c.is_solved():
                             self.c.sequence("B")
                             final_edge_algorithm += " B"
-
+            # If the cube is solved, return the algorithm
             if self.c.is_solved():
                 return final_edge_algorithm
+            # If not, an error occurred, so return nothing
             else:
                 return None
 
     def solveCube(self):
+        # Check if cube is already solved
         if self.c.is_solved():
             print("Cube Already Solved")
         else:
-            print("----------------------------------------------------------------------------------")
-            stage_1 = self.solveWhiteCross()
-            if stage_1 == None:
-                print("Error Solving White Cross")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_2 = self.solveWhiteCorner()
-            if stage_2 == None:
-                print("Error White Corner")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_3 = self.solveSecondLayer()
-            if stage_3 == None:
-                print("Error Solving F2L")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_4 = self.solveYellowCross()
-            if stage_4 == None:
-                print("Error Solving Yellow Cross")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_5 = self.orientLastLayer()
-            if stage_5 == None:
-                print("Error Solving OLL")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_6 = self.solveFinalCorners()
-            if stage_6 == None:
-                print("Error Solving Final Corner")
-                return None
-            print("----------------------------------------------------------------------------------")
-            stage_7 = self.solveFinalEdge()
-            if stage_7 == None:
-                print("Error Solving Final Edge")
-                return None
-            print("----------------------------------------------------------------------------------")
-
-            solve_list = [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6, stage_7]
-            return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
-
-    def solveCube_(self):
-        # Solves cube with no print
-        if self.c.is_solved():
-            pass
-        else:
+            # Work through solve, stage by stage
+            # Return None is an error occurs and print error message
             stage_1 = self.solveWhiteCross()
             if stage_1 == None:
                 print("Error Solving White Cross")
@@ -1217,39 +1185,49 @@ class SolveCube:
             if stage_7 == None:
                 print("Error Solving Final Edge")
                 return None
-
+            # Return full solve / list of all stages
             solve_list = [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6, stage_7]
             return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 
     def generateScramble(self):
+        # Declare possible moves from within a list
         notation = [" R ", " U ", " F ", " L ", " B ", "  D ", " Ri ", " Ui ", " Fi ", " Li ", " Bi ", "  Di "]
+        # Final scramble algorithm
         scramble = " "
-        for i in range(1, 30):
+        # Length of algorithm will be 30 characters long
+        for i in range(0, 30):
+            # Picks a random move, at random and appends it to the string
             scramble += str(notation[random.randrange(0, 12)])
+        # Returns the random scramble
         return scramble
 
     def testSolver(self, testAmount):
         # Test the cube on x number of random scrambles
-        cube_scrambles = []
         solve_amount = []
         scrambles_success = 0
         scrambles_failed = 0
         scrambles_failed_list = []
         for i in range(int(testAmount)):
+            # Show current test number:
             print("Test Number " + str(i))
+            # Initialise Cube
             new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+            # Randomly scramble the cube
             scramble = self.generateScramble()
             new_cube.sequence(scramble)
             self.c = new_cube
-            self.solveCube_()
+            # Solve the cube
+            self.solveCube()
+            # Check if it has been solved and update variables
             if self.c.is_solved():
                 scrambles_success += 1
                 print("Test " + str(i) + " Solved \n")
+            # Check if it has not been solved and update variables
             else:
                 scrambles_failed += 1
                 scrambles_failed_list.append(scramble)
                 print("Test " + str(i) + " Failed \n")
-        cube_scrambles.append(scramble)
+        # Final output for user inspection
         print("Final Results of " + str(testAmount) + " random scrambles")
         print("Success = " + str(scrambles_success))
         print("Failed = " + str(scrambles_failed))
