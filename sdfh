@@ -92,6 +92,68 @@ GGG WWW BBG YYY
 
 
 
+    This is how the layout of the cube is expected to be to be:
+                   ----------------
+                   | 0  | 1  | 2  |
+                   ----------------
+                   | 3  | 4  | 5  |
+                   ----------------
+                   | 6  | 7  | 8  |
+                   ----------------
+    -------------------------------------------------------------
+    | 9  | 10 | 11 | 18 | 19 | 20 | 27 | 28 | 29 | 36 | 37 | 38 |
+    -------------------------------------------------------------
+    | 12 | 13 | 14 | 21 | 22 | 23 | 30 | 31 | 32 | 39 | 40 | 41 |
+    -------------------------------------------------------------
+    | 15 | 16 | 17 | 24 | 25 | 26 | 33 | 34 | 35 | 42 | 43 | 44 |
+    -------------------------------------------------------------
+                   ----------------
+                   | 45 | 46 | 47 |
+                   ----------------
+                   | 48 | 49 | 50 |
+                   ----------------
+                   | 51 | 52 | 53 |
+                   ----------------
+    So the final cube should be in the same format:
+    "012345678910111213141516171819202122232425262728293031323435363738394041424344454647484950515253"
+
+
+
+How it works (In More Detail):
+
+User will select a rectangle from the bottom right.
+
+If this rectangle is in the options dictionary, then it means you have selected a colour from the bottom right.
+
+This will set current_color to a value stored in the dictionary - so if you select rectangle 55 for example, this
+rectangle corresponds to the colour white, and therefore current_color will be set to "White".
+
+With current_color now being "White", if you select a rectangle not in options, which means any of the rectangles
+that build up the cube, the colour value of this rectangle will be changed to the current_colour variable.
+
+This is all only available whilst edit mode is active, if edit mode is not active, clicking on any rectangle will
+not do anything.
+
+
+
+
+How the full solve works...
+
+This method starts by checking if the user is still in edit mode, if they are and they press solve cube, their changes
+will not be made, and therefore they will be given an incorrect solving method.
+
+Then we check if the cube is already solved, and if so we return a messagebox to inform the user that the cube is
+already solved.
+
+Then we take the current cube, and check it has 9 of each colour using the checkSolvable method. If it is, we move on
+to solving the cube - if it does the number of colours is not equal to 9 of each, we inform the user this.
+
+The finally, we clear the solving list box, and use performAlgorithm() to make those changes on the cube.
+The cube will eventually be solved.
+
+We also add each move to the solve list box, so that the user can see the full solve.
+
+
 
 
 

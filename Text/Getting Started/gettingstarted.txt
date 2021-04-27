@@ -13,4 +13,4 @@ B). Draw Your cube digitally using 'Enter Edit Mode'
 
 C). Play around, using random scrambles, and making moves using Cube Notation
 
-D). Challange yourself to solve the cube using step-by-step solve to check your progress
+D). Challenge yourself to solve the cube using step-by-step solve to check your progress
