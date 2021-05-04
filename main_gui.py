@@ -1159,45 +1159,10 @@ resetButton = btn(root, text="Reset Cube", command=lambda: resetCube(), bg="#EEE
 resetButton.config(font=("Arial", 15))
 resetButton.place(x=1220, y=700)
 
-# ENSURE DEMO RAISE POINT ABOUT CUBE VALIDATION
-
+# Make Root Window Not Resizable
 root.resizable(False, False)
 root.mainloop()
 
-# TODO
-
-# EVALUATION CHAPTER - 2k words
-# 1000 words per part
-# 6.1 eval of product
-#   - subjectivity and objectivity
-#   - my subjective view of quality of product (strengths & weaknesses)
-#   - Objectivity - quantitative (proper testing) undertake (non functional) -- test dark mode for this as well
-#   - qualitative - usability / user testing (mum / dad / sister / girlfriend)
-# 6.2 eval of project approach
-#   - Identify 2/3 themes (e.g. key challenges, (setting up environment, time management, project planning, motivation))
-
-# Finish design chapter
-# Finish project
-# Start evaluation chapter
-
-
-
-
-
-# GRI
-
-# they have software that helps people recruit and deal with suppliers and agencies
-
-# Work for seasonal workers
-# Temps in and out
-
-# Supermarkets need temp workers in and out
-
-# What is a neutral vendor? --> this role is working on their flagship software
-
-# How does graduate program play out, does it fford flexbility and range of prijects
-
-# How quickly can you advance through the program 
 
 
 
