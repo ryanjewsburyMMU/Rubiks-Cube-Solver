@@ -153,6 +153,8 @@ class CubeScanner():
             key = cv2.waitKey(1)
 
             if key == 32:
+                begin_time = time.time()
+
                 text = "Press ENTER to Confirm"
 
                 top_left = np.median(frame[200:250, 480:530, :], axis=(0, 1))
@@ -210,8 +212,11 @@ class CubeScanner():
 
                 target = webcolors.name_to_rgb(full_cube[2, 2])
                 bottom_right_color = (target[2], target[1], target[0])
+                end_time = time.time() - begin_time
+                print("Scanning Time = ", round(end_time, 5), "Seconds (Mean)")
 
             if key == 13:
+                print("bitch")
                 if face_index == 5:
                     text = "You have scanned your cube - exiting in 5 seconds"
                     rubiks_cube[face_index] = full_cube
@@ -228,6 +233,7 @@ class CubeScanner():
                 else:
                     text = "Please Scan the " + face_list[face_index] + " Face"
                     subtext = "With the " + face_up_list[face_index] + " Face, facing upwards."
+
             elif key == 27:
                 cv2.destroyAllWindows()
                 for i in range(1, 5):

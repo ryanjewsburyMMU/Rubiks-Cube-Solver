@@ -2,6 +2,8 @@ from rubik.cube import Cube
 from rubik_solver import utils
 import pycuber as pc
 import random
+import time
+import statistics
 
 
 class SolveCube:
@@ -1143,6 +1145,7 @@ class SolveCube:
                         while not self.c.is_solved():
                             self.c.sequence("B")
                             final_edge_algorithm += " B"
+                        pass
             # If the cube is solved, return the algorithm
             if self.c.is_solved():
                 return final_edge_algorithm
@@ -1187,6 +1190,7 @@ class SolveCube:
                 return None
             # Return full solve / list of all stages
             solve_list = [stage_1, stage_2, stage_3, stage_4, stage_5, stage_6, stage_7]
+            print("Cube Solved")
             return stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7, solve_list
 
     def generateScramble(self):
@@ -1203,12 +1207,14 @@ class SolveCube:
 
     def testSolver(self, testAmount):
         # Test the cube on x number of random scrambles
-        solve_amount = []
         scrambles_success = 0
         scrambles_failed = 0
         scrambles_failed_list = []
+        time_taken = []
+        move_count = []
         for i in range(int(testAmount)):
             # Show current test number:
+            begin_time = time.time()
             print("Test Number " + str(i))
             # Initialise Cube
             new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
@@ -1217,7 +1223,7 @@ class SolveCube:
             new_cube.sequence(scramble)
             self.c = new_cube
             # Solve the cube
-            self.solveCube()
+            algo = self.solveCube()
             # Check if it has been solved and update variables
             if self.c.is_solved():
                 scrambles_success += 1
@@ -1227,13 +1233,19 @@ class SolveCube:
                 scrambles_failed += 1
                 scrambles_failed_list.append(scramble)
                 print("Test " + str(i) + " Failed \n")
+            end_time = time.time() - begin_time
+            time_taken.append(round(end_time,3))
+
+            move_count.append(len(algo[0].split()))
+
         # Final output for user inspection
+
         print("Final Results of " + str(testAmount) + " random scrambles")
         print("Success = " + str(scrambles_success))
         print("Failed = " + str(scrambles_failed))
         print("Failed Scrambles = " + str(scrambles_failed_list))
+        print("Average execution time:", round(statistics.mean(time_taken),2) ,"Seconds (Mean)")
+        print("Total execution time:", round(sum(time_taken), 3), "Seconds")
+        print("Average Move Count: ", statistics.mean(move_count))
 
 
-new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
-new_cube.sequence("Bi  Fi   Di  Ri  Fi  Fi  Ui  Fi  Fi  Bi  Li   D   D  Li  R  L  F  R  Bi")
-S = SolveCube(new_cube)
