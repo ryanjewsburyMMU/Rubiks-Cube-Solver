@@ -25,3 +25,5 @@ mean =  [111.81111111, 104.03333333,  96.55555556]
 std =  [7.11320282, 11.0919891,  17.43439201]
 
 
+These have been calculated with a sample data set captured by me -- the following are
+the averages from each of the colour values (for use in main scanner)

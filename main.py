@@ -29,12 +29,12 @@ def test_solver():
     print(test_cube)
 
     # Bulk Testing - Tests on test_amount number of random cubes:
-    test_amount = 100
-    S.testSolver(test_amount)
+    # test_amount = 100
+    # S.testSolver(test_amount)
 
 
-test_solver()
+# test_solver()
 
-# test_scanner()
+test_scanner()
 
 # main()

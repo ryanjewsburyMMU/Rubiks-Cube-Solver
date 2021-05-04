@@ -1,3 +1,5 @@
+# This is the first draft of the GUI - working, but with some obvious flaws in functionality
+
 from rubik.cube import Cube
 from tkinter import *
 from tkinter import messagebox

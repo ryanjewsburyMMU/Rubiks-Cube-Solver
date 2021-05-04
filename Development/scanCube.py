@@ -1,5 +1,5 @@
 # OpenCV Colour detection Test
-
+# First generation of cube scanner, now deprecated
 import cv2
 import time
 import numpy as np

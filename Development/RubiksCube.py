@@ -6,6 +6,8 @@ import time
 import random
 import statistics
 
+# This is generation 1 of the cube solver
+
 
 # Stage One Solves White Cross
 def findWhiteEdge(c):

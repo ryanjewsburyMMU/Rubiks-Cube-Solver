@@ -4,7 +4,7 @@ import numpy as np
 import webcolors
 import time
 
-
+# Class for cube scanner
 class CubeScanner():
     # Variable Dec
     # Dataset of Colours
@@ -46,14 +46,15 @@ class CubeScanner():
         bottom_middle_color = (255, 255, 255)
         bottom_right_color = (255, 255, 255)
 
-        # Declaring Text On Screem
-        text = "Please Scan The " + face_list[face_index] + " Face"
+        # Declaring Text On Screen
+        text = "Please Scan The " + face_list[face_index] + " Face (SPACEBAR)"
         subtext = "With the " + face_up_list[face_index] + " face, facing upwards."
         close_text = "Press 'ESC' To Close"
 
-
+        # Init video cap
         cap = cv2.VideoCapture(0)
 
+        # Draw cube on top left of screen
         def drawCube():
             cv2.rectangle(frame, (10, 10), (50, 50), top_left_color, -1)
             cv2.rectangle(frame, (60, 10), (100, 50), top_middle_color, -1)
@@ -67,6 +68,7 @@ class CubeScanner():
             cv2.rectangle(frame, (60, 110), (100, 150), bottom_middle_color, -1)
             cv2.rectangle(frame, (110, 110), (150, 150), bottom_right_color, -1)
 
+        # Makes prediction based off of the current colour value
         def makePrediction(currentMean):
             colourResult = []
             # First calculate std for every one and take smallest index
@@ -126,13 +128,10 @@ class CubeScanner():
 
             # Text On Screen
             # Instructions
-            cv2.putText(frame, text, (textX, textY-30), font, 1, (0, 0, 0), 2)
-            cv2.putText(frame, subtext, (subtextX - 60, (subtextY + 50)-30), font, 1, (0, 0, 0), 2)
+            cv2.putText(frame, text, (textX+30, textY-30), font, 1, (0, 0, 0), 2)
+            cv2.putText(frame, subtext, (355, (subtextY + 50)-30), font, 1, (0, 0, 0), 2)
             # Close Scanner
             cv2.putText(frame, close_text, (10,700), font, 1, (0, 0, 0), 2)
-
-
-
 
             cv2.rectangle(frame, (480, 200), (530, 250), (192, 192, 192), thickness=3)
             cv2.rectangle(frame, (615, 200), (665, 250), (192, 192, 192), thickness=3)
@@ -152,6 +151,7 @@ class CubeScanner():
             ret, frame = cap.read()
             key = cv2.waitKey(1)
 
+            # User presses SPACEBAR to scan the cube once lined up.
             if key == 32:
                 begin_time = time.time()
 
@@ -215,8 +215,10 @@ class CubeScanner():
                 end_time = time.time() - begin_time
                 print("Scanning Time = ", round(end_time, 5), "Seconds (Mean)")
 
+            # User has scanned their cube with space bar
+            # And now they press ENTER (key 13) to submit the colours
             if key == 13:
-                print("bitch")
+                # Full cube has been scanned
                 if face_index == 5:
                     text = "You have scanned your cube - exiting in 5 seconds"
                     rubiks_cube[face_index] = full_cube
@@ -225,15 +227,17 @@ class CubeScanner():
                         cv2.waitKey(1)
                     return rubiks_cube
 
+                # Face has been scanned, so move onto the next face
                 elif full_cube[1, 1] == face_list[face_index]:
                     rubiks_cube[face_index] = full_cube
                     face_index += 1
-                    text = "Please Scan The " + face_list[face_index] + " Face"
+                    text = "Please Scan The " + face_list[face_index] + " Face (SPACEBAR)"
                     subtext = "With the " + face_up_list[face_index] + " Face, facing upwards."
+                # User did not scan the correct face - so scan the same face again
                 else:
                     text = "Please Scan the " + face_list[face_index] + " Face"
                     subtext = "With the " + face_up_list[face_index] + " Face, facing upwards."
-
+            # User exits the program
             elif key == 27:
                 cv2.destroyAllWindows()
                 for i in range(1, 5):
