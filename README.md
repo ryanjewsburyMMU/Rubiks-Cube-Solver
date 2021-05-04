@@ -112,3 +112,23 @@ https://stummuac-my.sharepoint.com/:f:/g/personal/18006190_stu_mmu_ac_uk/El_RWux
 
 
 
+The main solver class makes use of Rubik-Cube from PyPi
+https://pypi.org/project/rubik-cube/
+
+# Using The Solver
+<details>
+  <summary>Click to see code!</summary>
+  
+  ## Solving A Cube
+  ``` Python
+  from rubik.cube import Cube
+
+  new_cube = Cube("OOOOOOOOOGGGWWWBBBYYYGGGWWWBBBYYYGGGWWWBBBYYYRRRRRRRRR")
+
+  S = SolveCube(new_cube)
+
+  S.solveCube()
+
+  ```
+</details>
+
